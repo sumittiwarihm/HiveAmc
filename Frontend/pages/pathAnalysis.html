@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Path Analysis - AdPulse</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/homeStyles.css">
+</head>
+<body>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-box">AP</div>
+                <h1 class="brand-name">AdPulse</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="home.html"><i class="fa-solid fa-house"></i> Home</a></li>
+                    <li><a href="newAndRepeat.html"><i class="fa-solid fa-users"></i> New & Repeat Cust</a></li>
+                    <li><a href="audienceAndreach.html"><i class="fa-solid fa-bullseye"></i> Audience and Reach Frequency</a></li>
+                    <li class="active"><a href="pathAnalysis.html"><i class="fa-solid fa-route"></i> Path Analysis</a></li>
+                    <li><a href="adTypeOverlap.html"><i class="fa-solid fa-layer-group"></i> Ad Type Overlap</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="cookie-btn">Manage cookies or opt out</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <h2>Hello, User</h2> <p class="current-date">Thursday, December 18, 2025</p>
+                </div>
+                
+                <div class="date-picker-container">
+                    <div class="date-trigger" id="dateTrigger">
+                        <i class="fa-regular fa-calendar"></i>
+                        <span id="selectedRangeText">Nov 18, 2025 - Dec 18, 2025</span>
+                    </div>
+
+                    <div class="date-dropdown" id="dateDropdown">
+                        <div class="date-presets">
+                            <button class="preset-btn" data-range="7">Last 7 days</button>
+                            <button class="preset-btn" data-range="30">Last 30 days</button>
+                            <button class="preset-btn" data-range="90">Last 3 months</button>
+                        </div>
+                        <div class="calendar-nav">
+                            <button id="prevMonth"><i class="fa-solid fa-chevron-left"></i></button>
+                            <div class="month-labels">
+                                <span id="monthLabel1">December 2025</span>
+                                <span id="monthLabel2">January 2026</span>
+                            </div>
+                            <button id="nextMonth"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                        <div class="calendar-wrapper">
+                            <div class="month-grid" id="calendar1"></div>
+                            <div class="month-grid" id="calendar2"></div>
+                        </div>
+                        <div class="date-actions">
+                            <button class="apply-btn" id="applyDateBtn">Apply</button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="summary-section">
+                <div class="card summary-card">
+                    <h3 class="red-text">Spends</h3>
+                    <div class="value">₹1,26,000</div>
+                </div>
+                <div class="card summary-card">
+                    <h3 class="red-text">Orders</h3>
+                    <div class="value">4,200</div>
+                </div>
+                <div class="card summary-card">
+                    <h3 class="red-text">Revenue</h3>
+                    <div class="value">₹9,60,000</div>
+                </div>
+            </section>
+
+            <section class="full-width-section">
+                <div class="card path-table-card">
+                    
+                    <div class="path-controls-header">
+                        <div class="path-title-group">
+                            <h3>Path-to-Purchase Performance</h3>
+                            <p class="subtitle">Analyze campaign journeys by NTB Revenue, Conversion Time, and Channel Sequences.</p>
+                        </div>
+                        
+                        <div class="path-filters">
+                            <div class="filter-row">
+                                <select class="custom-select-small"><option>Last 30 Days</option></select>
+                                <select class="custom-select-small"><option>All Campaigns</option></select>
+                                
+                                <div class="toggle-pill-container">
+                                    <button class="toggle-pill-btn active" id="btnNewCust">New Customers</button>
+                                    <button class="toggle-pill-btn" id="btnRepeatCust">Repeat Customers</button>
+                                </div>
+
+                                <select class="custom-select-small"><option>All ASINs</option></select>
+                            </div>
+                            <div class="filter-row right-align">
+                                <select class="custom-select-small"><option>All Keywords</option></select>
+                                <button class="export-btn"><i class="fa-solid fa-download"></i> Export CSV</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="path-table">
+                            <thead>
+                                <tr>
+                                    <th width="50%">Path</th>
+                                    <th width="25%" class="text-right">NTB Rev. Generated (INR) <i class="fa-solid fa-arrow-down-short-wide"></i></th>
+                                    <th width="25%" class="text-right">Median Time to Purchase (Minutes) <i class="fa-solid fa-arrow-down-short-wide"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="path-sequence">
+                                            <span class="badge badge-search">Search</span>
+                                            <i class="fa-solid fa-arrow-right-long arrow-icon"></i>
+                                            <span class="badge badge-sp">SP</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-right">
+                                        <div class="value-primary">₹58,400</div>
+                                        <div class="spark-bar" style="width: 80%"></div>
+                                    </td>
+                                    <td class="text-right">
+                                        4.2 minutes <span class="trend-up"><i class="fa-solid fa-arrow-up"></i></span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <div class="path-sequence">
+                                            <span class="badge badge-dsp">DSP</span>
+                                            <i class="fa-solid fa-arrow-right-long arrow-icon"></i>
+                                            <span class="badge badge-sp">SP</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-right">
+                                        <div class="value-primary">₹51,200</div>
+                                        <div class="spark-bar" style="width: 70%"></div>
+                                    </td>
+                                    <td class="text-right">
+                                        5.1 minutes <span class="trend-up"><i class="fa-solid fa-arrow-up"></i></span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <div class="path-sequence">
+                                            <span class="badge badge-social">Social</span>
+                                            <i class="fa-solid fa-arrow-right-long arrow-icon"></i>
+                                            <span class="badge badge-search">Search</span>
+                                            <i class="fa-solid fa-arrow-right-long arrow-icon"></i>
+                                            <span class="badge badge-sp">SP</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-right">
+                                        <div class="value-primary">₹42,800</div>
+                                        <div class="spark-bar" style="width: 60%"></div>
+                                    </td>
+                                    <td class="text-right">
+                                        8.7 minutes <span class="trend-up"><i class="fa-solid fa-arrow-up"></i></span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <div class="path-sequence">
+                                            <span class="badge badge-dsp">DSP</span>
+                                            <i class="fa-solid fa-arrow-right-long arrow-icon"></i>
+                                            <span class="badge badge-search">Search</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-right">
+                                        <div class="value-primary">₹39,600</div>
+                                        <div class="spark-bar" style="width: 55%"></div>
+                                    </td>
+                                    <td class="text-right">
+                                        6.3 minutes <span class="trend-down"><i class="fa-solid fa-arrow-down"></i></span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <div class="path-sequence">
+                                            <span class="badge badge-sp">SP</span>
+                                            <i class="fa-solid fa-arrow-right-long arrow-icon"></i>
+                                            <span class="badge badge-search">Search</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-right">
+                                        <div class="value-primary">₹47,900</div>
+                                        <div class="spark-bar" style="width: 65%"></div>
+                                    </td>
+                                    <td class="text-right">
+                                        7.1 minutes <span class="trend-up"><i class="fa-solid fa-arrow-up"></i></span>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="path-sequence">
+                                            <span class="badge badge-social">Social</span>
+                                            <i class="fa-solid fa-arrow-right-long arrow-icon"></i>
+                                            <span class="badge badge-dsp">DSP</span>
+                                            <i class="fa-solid fa-arrow-right-long arrow-icon"></i>
+                                            <span class="badge badge-sp">SP</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-right">
+                                        <div class="value-primary">₹35,400</div>
+                                        <div class="spark-bar" style="width: 48%"></div>
+                                    </td>
+                                    <td class="text-right">
+                                        10.5 minutes <span class="trend-down"><i class="fa-solid fa-arrow-down"></i></span>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="path-sequence">
+                                            <span class="badge badge-search">Search</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-right">
+                                        <div class="value-primary">₹62,300</div>
+                                        <div class="spark-bar" style="width: 85%"></div>
+                                    </td>
+                                    <td class="text-right">
+                                        3.8 minutes <span class="trend-up"><i class="fa-solid fa-arrow-up"></i></span>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </section>
+
+            <div class="footer-info">
+                <button class="help-btn">?</button>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../assets/js/pathAnalysisScript.js"></script>
+</body>
+</html>
