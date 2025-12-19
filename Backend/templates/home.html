@@ -1,11 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    hello guys
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home Dashboard - AdPulse{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+    <section class="summary-section">
+        <div class="card summary-card">
+            <h3 class="red-text">Spends</h3>
+            <div class="value">₹{{ spends }}</div>
+        </div>
+        <div class="card summary-card">
+            <h3 class="red-text">Orders</h3>
+            <div class="value">{{ orders }}</div>
+        </div>
+        <div class="card summary-card">
+            <h3 class="red-text">Revenue</h3>
+            <div class="value">₹{{ revenue }}</div>
+        </div>
+    </section>
+
+    <section class="charts-section">
+        <div class="card chart-card">
+            <h3>Spends Trend</h3>
+            <div class="chart-container">
+                <canvas id="spendsChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card">
+            <h3>Orders Trend</h3>
+            <div class="chart-container">
+                <canvas id="ordersChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card">
+            <h3>Revenue Trend</h3>
+            <div class="chart-container">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // --- 1. Pass Django Chart Data to JavaScript ---
+        // The '|safe' filter prevents Django from escaping the JSON string
+        const chartData = {
+            labels: {{ chart_labels|safe }},
+            spends: {{ chart_spends|safe }},
+            orders: {{ chart_orders|safe }},
+            revenue: {{ chart_revenue|safe }}
+        };
+
+        // --- 2. Update Date Picker Text (Visual Feedback) ---
+        // This updates the header text to show the currently selected range from Django
+        document.addEventListener('DOMContentLoaded', () => {
+            const dateText = document.getElementById('selectedRangeText');
+            if(dateText) {
+                dateText.innerText = "{{ display_date_range }}";
+            }
+        });
+    </script>
+
+    <script src="{% static 'js/homeScript.js' %}"></script>
+{% endblock %}

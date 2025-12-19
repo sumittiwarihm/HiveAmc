@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ad Type Overlap - AdPulse{% endblock %}
+
+{% block content %}
+    <section class="summary-section">
+        <div class="card summary-card">
+            <h3 class="red-text">Spends</h3>
+            <div class="value">₹1,26,000</div>
+        </div>
+        <div class="card summary-card">
+            <h3 class="red-text">Orders</h3>
+            <div class="value">4,200</div>
+        </div>
+        <div class="card summary-card">
+            <h3 class="red-text">Revenue</h3>
+            <div class="value">₹9,60,000</div>
+        </div>
+    </section>
+
+    <section class="overlap-section">
+        
+        <div class="overlap-header-container">
+            <div class="center-text-block">
+                <h3>Ad Type Overlap</h3>
+                <p class="subtitle">Visualize purchase rate overlap between ad types by customer cohort and campaign</p>
+            </div>
+
+            <div class="overlap-controls-row">
+                <button class="control-pill"><i class="fa-regular fa-calendar"></i> Last 30 Days <i class="fa-solid fa-chevron-down"></i></button>
+                
+                <div class="segmented-control">
+                    <button class="segment-btn active" id="btnNew">New Customers</button>
+                    <button class="segment-btn" id="btnRepeat">Repeat Customers</button>
+                </div>
+
+                <button class="control-pill">Campaign: Overall Campaigns <i class="fa-solid fa-chevron-down"></i></button>
+            </div>
+        </div>
+
+        <div class="card venn-layout-card">
+            <div class="chart-header-center">
+                <h4>Purchase Rate by Ad Type</h4>
+                <p>Visual representation of purchase performance overlap between ad types</p>
+            </div>
+
+            <div class="venn-wrapper">
+                <div class="venn-circle blue-circle">
+                    <div class="v-content v-left">
+                        <span class="v-title">Search</span>
+                        <span class="v-sub">Purchase Rate</span>
+                        <span class="v-num">3.2%</span>
+                    </div>
+                </div>
+
+                <div class="venn-circle green-circle">
+                    <div class="v-content v-right">
+                        <span class="v-title">DSP</span>
+                        <span class="v-sub">Purchase Rate</span>
+                        <span class="v-num">2.3%</span>
+                    </div>
+                </div>
+                
+                <div class="overlap-label">
+                    <span class="v-title-small">Search + DSP</span>
+                    <span class="v-sub-small">Purchase Rate</span>
+                    <span class="v-num-small">6.7%</span>
+                </div>
+            </div>
+
+            <div class="insight-pill">
+                <div class="bulb-icon"><i class="fa-regular fa-lightbulb"></i></div>
+                <p>New customers show moderate overlap (<strong>6.7%</strong>) between Search and DSP channels, indicating opportunity for increased cross-channel exposure.</p>
+            </div>
+        </div>
+
+        <div class="overlap-metrics-row">
+            <div class="card metric-box">
+                <div class="mb-header">
+                    <span>Search Ad Type</span>
+                    <div class="dot dot-blue"></div>
+                </div>
+                <div class="mb-stat">3.2%</div>
+                <div class="mb-sub">4,850 users · 155 conversions</div>
+            </div>
+
+            <div class="card metric-box">
+                <div class="mb-header">
+                    <span>Search + DSP Overlap</span>
+                    <div class="dot dot-teal"></div>
+                </div>
+                <div class="mb-stat">6.7%</div>
+                <div class="mb-sub">5,240 users · 351 conversions</div>
+            </div>
+
+            <div class="card metric-box">
+                <div class="mb-header">
+                    <span>DSP Ad Type</span>
+                    <div class="dot dot-green"></div>
+                </div>
+                <div class="mb-stat">2.3%</div>
+                <div class="mb-sub">3,920 users · 90 conversions</div>
+            </div>
+        </div>
+
+    </section>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'js/adTypeOverlapScript.js' %}"></script>
+{% endblock %}

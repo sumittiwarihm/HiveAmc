@@ -116,3 +116,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+import os  # Ensure this import is at the top of the file if not already present
+
+# 1. Tell Django where to look for static files in your project root
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+# 2. (Optional but recommended) Where files go when you run 'collectstatic'
+STATIC_ROOT = BASE_DIR / 'staticfiles'

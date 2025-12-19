@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Audience & Reach - AdPulse{% endblock %}
+
+{% block content %}
+    <section class="summary-section">
+        <div class="card summary-card">
+            <h3 class="red-text">Total Reach</h3>
+            <div class="value">850,000</div>
+        </div>
+        <div class="card summary-card">
+            <h3 class="red-text">Avg Frequency</h3>
+            <div class="value">3.2</div>
+        </div>
+        <div class="card summary-card">
+            <h3 class="red-text">Impressions</h3>
+            <div class="value">2.4M</div>
+        </div>
+    </section>
+
+    <div class="section-header-row">
+        <div class="text-group">
+            <h3>Audience and Reach Frequency</h3>
+            <p class="subtitle">Analyze audience reach, unique users, and conversion efficiency</p>
+        </div>
+    </div>
+
+    <section class="full-width-section">
+        <div class="card full-width-chart-card">
+            
+            <div class="chart-header-flex">
+                <div class="chart-header-text">
+                    <h3>Audience Reach vs Conversion Efficiency</h3>
+                </div>
+                <div class="chart-header-controls">
+                    <select class="custom-select">
+                        <option>Amazon DSP</option>
+                        <option>Sponsored Products</option>
+                        <option>Sponsored Brands</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="chart-container-large">
+                <canvas id="audienceReachChart"></canvas>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'js/audienceAndReachScript.js' %}"></script>
+{% endblock %}

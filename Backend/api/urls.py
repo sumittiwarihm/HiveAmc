@@ -1,6 +1,10 @@
 from django.urls import path
-from .views import homePageData
+from .views import home, new_and_repeat, audience, path_analysis, ad_overlap
 
 urlpatterns = [
-    path('homePage/', homePageData, name="homePage"),
+    path('homePage/', home, name="home"),
+    path('new_and_repeat/', new_and_repeat, name="new_and_repeat"),
+    path('audience/', audience, name="audience"),
+    path('path_analysis/', path_analysis, name="path_analysis"),
+    path('ad_overlap/', ad_overlap, name="ad_overlap"),
 ]

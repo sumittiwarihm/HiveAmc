@@ -1,0 +1,60 @@
+/* =========================================
+   HOME PAGE SPECIFIC STYLES
+   ========================================= */
+
+/* Charts Section Grid */
+.charts-section {
+    display: grid;
+    /* Force 3 columns of equal width by default */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px; /* Space between charts */
+    width: 100%;
+}
+
+/* Chart Card Styling */
+.chart-card h3 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #333;
+    font-weight: 600;
+}
+
+/* Canvas Container */
+.chart-container {
+    position: relative;
+    height: 300px; /* Fixed height ensures they are all the same size */
+    width: 100%;
+}
+
+/* =========================================
+   RESPONSIVE BREAKPOINTS
+   ========================================= */
+
+/* Medium Screens (e.g., Laptops or Horizontal Tablets) */
+/* When screen width is less than 1200px, switch to 2 columns */
+@media (max-width: 1200px) {
+    .charts-section {
+        grid-template-columns: repeat(2, 1fr); 
+    }
+
+    /* Make the 3rd chart span across the full bottom row so it looks balanced */
+    .chart-card:last-child {
+        grid-column: span 2;
+    }
+}
+
+/* Small Screens (e.g., Mobile Phones) */
+/* When screen width is less than 768px, switch to 1 column (vertical stack) */
+@media (max-width: 768px) {
+    .charts-section {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-card:last-child {
+        grid-column: auto; /* Reset span */
+    }
+
+    .chart-container {
+        height: 250px; /* Slightly shorter charts on mobile */
+    }
+}
