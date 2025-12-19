@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New & Repeat Analysis - AdPulse</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/homeStyles.css">
+</head>
+<body>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-box">AP</div>
+                <h1 class="brand-name">AdPulse</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="home.html"><i class="fa-solid fa-house"></i> Home</a></li>
+                    <li class="active"><a href="newAndRepeat.html"><i class="fa-solid fa-users"></i> New & Repeat Cust</a></li>
+                    <li><a href="audienceAndreach.html"><i class="fa-solid fa-bullseye"></i> Audience and Reach Frequency</a></li>
+                    <li><a href="pathAnalysis.html"><i class="fa-solid fa-route"></i> Path Analysis</a></li>
+                    <li><a href="adTypeOverlap.html"><i class="fa-solid fa-layer-group"></i> Ad Type Overlap</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="cookie-btn">Manage cookies or opt out</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <h2>Hello, User</h2>
+                    <p class="current-date">Thursday, December 18, 2025</p>
+                </div>
+                
+                <div class="date-picker-container">
+                    <div class="date-trigger" id="dateTrigger">
+                        <i class="fa-regular fa-calendar"></i>
+                        <span id="selectedRangeText">Nov 18, 2025 - Dec 18, 2025</span>
+                    </div>
+
+                    <div class="date-dropdown" id="dateDropdown">
+                        <div class="date-presets">
+                            <button class="preset-btn" data-range="7">Last 7 days</button>
+                            <button class="preset-btn" data-range="30">Last 30 days</button>
+                            <button class="preset-btn" data-range="90">Last 3 months</button>
+                        </div>
+
+                        <div class="calendar-nav">
+                            <button id="prevMonth"><i class="fa-solid fa-chevron-left"></i></button>
+                            <div class="month-labels">
+                                <span id="monthLabel1">December 2025</span>
+                                <span id="monthLabel2">January 2026</span>
+                            </div>
+                            <button id="nextMonth"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+
+                        <div class="calendar-wrapper">
+                            <div class="month-grid" id="calendar1"></div>
+                            <div class="month-grid" id="calendar2"></div>
+                        </div>
+                        
+                        <div class="date-actions">
+                            <button class="apply-btn" id="applyDateBtn">Apply</button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="summary-section">
+                <div class="card summary-card">
+                    <h3 class="red-text">Spends</h3>
+                    <div class="value">₹1,26,000</div>
+                </div>
+                <div class="card summary-card">
+                    <h3 class="red-text">Orders</h3>
+                    <div class="value">4,200</div>
+                </div>
+                <div class="card summary-card">
+                    <h3 class="red-text">Revenue</h3>
+                    <div class="value">₹9,60,000</div>
+                </div>
+            </section>
+
+            <div class="section-header-row">
+                <div class="text-group">
+                    <h3>New and Repeat Customer Analysis</h3>
+                    <p class="subtitle">Comprehensive insights into customer behavior, revenue patterns, and campaign performance</p>
+                </div>
+                <div class="tabs-group">
+                    <button class="tab-btn active" onclick="switchTab('new')">New Customers</button>
+                    <button class="tab-btn" onclick="switchTab('repeat')">Repeat Customers</button>
+                </div>
+            </div>
+
+            <section class="metrics-grid">
+                <div class="card metric-card">
+                    <div class="metric-info"><span class="label">Revenue</span><div class="metric-value">₹89.5L</div></div>
+                    <div class="icon-box green-bg"><i class="fa-solid fa-dollar-sign"></i></div>
+                </div>
+                <div class="card metric-card">
+                    <div class="metric-info"><span class="label">% Revenue</span><div class="metric-value">75%</div></div>
+                    <div class="icon-box blue-bg"><i class="fa-solid fa-percent"></i></div>
+                </div>
+                <div class="card metric-card">
+                    <div class="metric-info"><span class="label">Purchases</span><div class="metric-value">1,245</div></div>
+                    <div class="icon-box purple-bg"><i class="fa-solid fa-cart-shopping"></i></div>
+                </div>
+                <div class="card metric-card">
+                    <div class="metric-info"><span class="label">% Purchases</span><div class="metric-value">75%</div></div>
+                    <div class="icon-box orange-bg"><i class="fa-solid fa-percent"></i></div>
+                </div>
+                <div class="card metric-card">
+                    <div class="metric-info"><span class="label">Total Units Sold</span><div class="metric-value">3,680</div></div>
+                    <div class="icon-box indigo-bg"><i class="fa-solid fa-box-open"></i></div>
+                </div>
+                <div class="card metric-card">
+                    <div class="metric-info"><span class="label">Clicks</span><div class="metric-value">45,200</div></div>
+                    <div class="icon-box pink-bg"><i class="fa-regular fa-paper-plane"></i></div>
+                </div>
+                <div class="card metric-card">
+                    <div class="metric-info"><span class="label">Purchase Views</span><div class="metric-value">12,800</div></div>
+                    <div class="icon-box teal-bg"><i class="fa-regular fa-eye"></i></div>
+                </div>
+                <div class="card metric-card">
+                    <div class="metric-info"><span class="label">Users</span><div class="metric-value">4,850</div></div>
+                    <div class="icon-box cyan-bg"><i class="fa-solid fa-user-group"></i></div>
+                </div>
+            </section>
+
+            <section class="full-width-section">
+                <div class="card full-width-chart-card">
+                    <div class="chart-header-block">
+                        <h3>NTB ASINs – Top Selling ASINs by Volume</h3>
+                        <p class="subtitle">Best performing products by units sold</p>
+                    </div>
+                    <div class="chart-container-large">
+                        <canvas id="ntbAsinChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dual-chart-section">
+                <div class="card chart-card">
+                    <div class="chart-header-block">
+                        <h3>Revenue by Ad Product Type</h3>
+                        <p class="subtitle">NTB vs Total revenue comparison</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="revByAdProductChart"></canvas>
+                    </div>
+                </div>
+                <div class="card chart-card">
+                    <div class="chart-header-flex">
+                        <div class="chart-header-text">
+                            <h3>NTB Metrics by Ad Product Type</h3>
+                            <p class="subtitle">Distribution across ad types</p>
+                        </div>
+                        <div class="chart-toggle-group">
+                            <button class="toggle-pill active" id="btnNtbUsers">NTB Users</button>
+                            <button class="toggle-pill" id="btnNtbUnits">NTB Units</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="ntbMetricsPieChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section class="full-width-section">
+                <div class="card full-width-chart-card">
+                    <div class="chart-header-block">
+                        <h3>Revenue and Spend of NTB Campaigns</h3>
+                        <p class="subtitle">Campaigns ordered by ascending NTBs generated</p>
+                    </div>
+                    <div class="chart-container-large">
+                        <canvas id="revSpendNtbChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <div class="footer-info">
+                <button class="help-btn">?</button>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../assets/js/newAndRepeatScript.js"></script>
+</body>
+</html>
