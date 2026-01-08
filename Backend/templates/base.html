@@ -7,6 +7,8 @@
     <title>{% block title %}AdPulse Dashboard{% endblock %}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block extra_css %}
+    {% endblock %}
 </head>
 <body>
 
@@ -43,45 +45,6 @@
 
         <main class="main-content">
             
-            <header class="dashboard-header">
-                <div class="header-left">
-                    <h2>Hello, User</h2>
-                    <p class="current-date">{% now "l, F d, Y" %}</p> </div>
-                
-                <div class="date-picker-container">
-                    <div class="date-trigger" id="dateTrigger">
-                        <i class="fa-regular fa-calendar"></i>
-                        <span id="selectedRangeText">Nov 18, 2025 - Dec 18, 2025</span>
-                    </div>
-
-                    <div class="date-dropdown" id="dateDropdown">
-                        <div class="date-presets">
-                            <button class="preset-btn" data-range="7">Last 7 days</button>
-                            <button class="preset-btn" data-range="30">Last 30 days</button>
-                            <button class="preset-btn" data-range="90">Last 3 months</button>
-                        </div>
-
-                        <div class="calendar-nav">
-                            <button id="prevMonth"><i class="fa-solid fa-chevron-left"></i></button>
-                            <div class="month-labels">
-                                <span id="monthLabel1">December 2025</span>
-                                <span id="monthLabel2">January 2026</span>
-                            </div>
-                            <button id="nextMonth"><i class="fa-solid fa-chevron-right"></i></button>
-                        </div>
-
-                        <div class="calendar-wrapper">
-                            <div class="month-grid" id="calendar1"></div>
-                            <div class="month-grid" id="calendar2"></div>
-                        </div>
-                        
-                        <div class="date-actions">
-                            <button class="apply-btn" id="applyDateBtn">Apply</button>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
             {% block content %}
             {% endblock %}
 

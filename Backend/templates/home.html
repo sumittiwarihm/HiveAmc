@@ -5,9 +5,105 @@
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <style>
+        /* --- NEW HEADER STYLES --- */
+        .page-header {
+            display: flex;
+            justify-content: space-between; /* Left aur Right content ko alag karta hai */
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 0 5px;
+        }
+
+        .header-left h1 {
+            font-size: 24px;
+            margin: 0;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .header-left .sub-text {
+            margin: 5px 0 0 0;
+            color: #888;
+            font-size: 14px;
+        }
+
+        /* Right Side Form Styling */
+        .top-date-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #fff;
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .date-input-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .label-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .top-date-form input[type="date"] {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 5px;
+            font-size: 13px;
+            color: #333;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .filter-btn {
+            background-color: #333; /* Dark button */
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-left: 5px;
+            transition: background 0.2s;
+        }
+
+        .filter-btn:hover {
+            background-color: #000;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
+
+    <div class="page-header">
+        <div class="header-left">
+            <h1>Hello, User</h1>
+            <p class="sub-text">Thursday, January 08, 2026</p>
+        </div>
+
+        <div class="header-right">
+            <form method="GET" action="" class="top-date-form">
+                <div class="date-input-group">
+                    <span class="label-text">Start:</span>
+                    <input type="date" name="start" value="{{ current_start }}" required>
+                </div>
+                
+                <div class="date-input-group">
+                    <span class="label-text">End:</span>
+                    <input type="date" name="end" value="{{ current_end }}" required>
+                </div>
+                
+                <button type="submit" class="filter-btn">Apply</button>
+            </form>
+        </div>
+    </div>
     <section class="summary-section">
         <div class="card summary-card">
             <h3 class="red-text">Spends</h3>
@@ -45,25 +141,17 @@
             </div>
         </div>
     </section>
+
 {% endblock %}
 
 {% block scripts %}
     <script>
-        // Use |safe to ensure the JSON string is not escaped by Django
         const chartData = {
             labels: {{ chart_labels|safe }},
             spends: {{ chart_spends|safe }},
             orders: {{ chart_orders|safe }},
             revenue: {{ chart_revenue|safe }}
         };
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const dateText = document.getElementById('selectedRangeText');
-            if(dateText) {
-                dateText.innerText = "{{ display_date_range }}";
-            }
-        });
     </script>
-
     <script src="{% static 'js/homeScript.js' %}"></script>
 {% endblock %}
