@@ -49,8 +49,7 @@
 
 {% block scripts %}
     <script>
-        // --- 1. Pass Django Chart Data to JavaScript ---
-        // The '|safe' filter prevents Django from escaping the JSON string
+        // Use |safe to ensure the JSON string is not escaped by Django
         const chartData = {
             labels: {{ chart_labels|safe }},
             spends: {{ chart_spends|safe }},
@@ -58,8 +57,6 @@
             revenue: {{ chart_revenue|safe }}
         };
 
-        // --- 2. Update Date Picker Text (Visual Feedback) ---
-        // This updates the header text to show the currently selected range from Django
         document.addEventListener('DOMContentLoaded', () => {
             const dateText = document.getElementById('selectedRangeText');
             if(dateText) {

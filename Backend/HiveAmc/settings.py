@@ -75,10 +75,15 @@ WSGI_APPLICATION = 'HiveAmc.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'adPulse',
+        'USER': 'postgres',
+        'PASSWORD': '_Hiv3Analyt1cs$',
+        'HOST': 'nucleus.ckojnefw0d56.us-west-1.rds.amazonaws.com', 
+        'PORT': '5432',      
     }
 }
+
 
 
 # Password validation
