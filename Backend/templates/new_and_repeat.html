@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}New & Repeat Analysis - AdPulse{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/new_and_repeat.css' %}">
+{% endblock %}
+
+{% block content %}
+
+    <header class="dashboard-header">
+        <div class="header-left">
+            <h2>Hello, User</h2>
+            <p class="current-date">{% now "l, F d, Y" %}</p> 
+        </div>
+        
+        <div class="date-picker-container">
+             <div class="date-picker-btn">
+                <i class="fa-regular fa-calendar"></i>
+                <span>Dec 9, 2025 - Jan 8, 2026</span>
+            </div>
+        </div>
+    </header>
+
+    <section class="summary-section">
+        <div class="summary-card">
+            <h3>Spends</h3>
+            <div class="value">₹1,26,000</div>
+        </div>
+        <div class="summary-card">
+            <h3>Orders</h3>
+            <div class="value">4,200</div>
+        </div>
+        <div class="summary-card">
+            <h3>Revenue</h3>
+            <div class="value">₹9,60,000</div>
+        </div>
+    </section>
+
+    <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 30px;">
+
+    <section class="analysis-section">
+        
+        <div class="analysis-header">
+            <div class="analysis-title">
+                <h2>New and Repeat Customer Analysis</h2>
+                <p>Comprehensive insights into customer behavior, revenue patterns, and campaign performance</p>
+            </div>
+            
+            <div class="toggle-tabs">
+                <button class="tab-btn active">New Customers</button>
+                <button class="tab-btn">Repeat Customers</button>
+            </div>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-info"><h4>Revenue</h4><div class="metric-value">₹89.5L</div></div>
+                <div class="metric-icon icon-green"><i class="fa-solid fa-dollar-sign"></i></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-info"><h4>% Revenue</h4><div class="metric-value">75%</div></div>
+                <div class="metric-icon icon-blue"><i class="fa-solid fa-percent"></i></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-info"><h4>Purchases</h4><div class="metric-value">1,245</div></div>
+                <div class="metric-icon icon-purple"><i class="fa-solid fa-cart-shopping"></i></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-info"><h4>% Purchases</h4><div class="metric-value">75%</div></div>
+                <div class="metric-icon icon-orange"><i class="fa-solid fa-percent"></i></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-info"><h4>Total Units Sold</h4><div class="metric-value">3,680</div></div>
+                <div class="metric-icon icon-indigo"><i class="fa-solid fa-box-open"></i></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-info"><h4>Clicks</h4><div class="metric-value">45,200</div></div>
+                <div class="metric-icon icon-pink"><i class="fa-solid fa-arrow-pointer"></i></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-info"><h4>Purchase Views</h4><div class="metric-value">12,800</div></div>
+                <div class="metric-icon icon-teal"><i class="fa-solid fa-eye"></i></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-info"><h4>Users</h4><div class="metric-value">4,850</div></div>
+                <div class="metric-icon icon-cyan"><i class="fa-solid fa-users"></i></div>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <div class="chart-header">
+                <h3>NTB ASINs – Top Selling ASINs by Volume</h3>
+                <p>Best performing products by units sold</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="topAsinChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <div class="chart-header">
+                <h3>Revenue and Spend of NTB Campaigns</h3>
+                <p>Campaigns ordered by ascending NTBs generated</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="ntbCampaignChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <div class="chart-header">
+                <h3>NTB Revenue & Units by Ad Type</h3>
+                <p>Revenue and units across SP, SB, SD, SBv, DSP</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="adTypeChart"></canvas>
+            </div>
+        </div>
+
+    </section>
+
+{% endblock %}  {% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- 1. ASIN CHART (Blue Bars) ---
+            const ctx1 = document.getElementById('topAsinChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['ASIN 1', 'ASIN 2', 'ASIN 3', 'ASIN 4', 'ASIN 5'],
+                    datasets: [{
+                        label: 'Units Sold',
+                        data: [1250, 980, 710, 520, 200],
+                        backgroundColor: '#2962ff',
+                        borderRadius: 4,
+                        barPercentage: 0.5,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 1400,
+                            grid: { borderDash: [5, 5], color: '#f0f0f0', drawBorder: false },
+                            title: { display: true, text: 'Units Sold', color: '#999' }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // --- 2. CAMPAIGN REVENUE vs SPEND CHART ---
+            const ctx2 = document.getElementById('ntbCampaignChart').getContext('2d');
+            const campaignLabels = [
+                ['Campaign E', '85 NTBs'], 
+                ['Campaign D', '142 NTBs'], 
+                ['Campaign C', '238 NTBs'], 
+                ['Campaign B', '412 NTBs'], 
+                ['Campaign A', '568 NTBs']
+            ];
+
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: campaignLabels,
+                    datasets: [
+                        {
+                            label: 'Revenue',
+                            data: [450000, 680000, 1150000, 1950000, 2850000],
+                            backgroundColor: '#00b894', // Green
+                            borderRadius: 4,
+                            barPercentage: 0.6,
+                            categoryPercentage: 0.8
+                        },
+                        {
+                            label: 'Spend',
+                            data: [120000, 180000, 320000, 520000, 780000],
+                            backgroundColor: '#f39c12', // Orange
+                            borderRadius: 4,
+                            barPercentage: 0.6,
+                            categoryPercentage: 0.8
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { usePointStyle: true, pointStyle: 'circle', padding: 20, font: { size: 14 } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.parsed.y !== null) {
+                                        label += '₹' + (context.parsed.y / 100000).toFixed(1) + 'L';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 3000000,
+                            grid: { borderDash: [5, 5], color: '#f0f0f0', drawBorder: false },
+                            ticks: {
+                                callback: function(value) {
+                                    if (value === 0) return '₹0';
+                                    return '₹' + (value / 100000).toFixed(1) + 'L';
+                                },
+                                color: '#888'
+                            }
+                        },
+                        x: { grid: { display: false }, ticks: { color: '#555' } }
+                    }
+                }
+            });
+
+            // --- 3. NTB REVENUE & UNITS BY AD TYPE (Dual Axis) ---
+            const ctx3 = document.getElementById('adTypeChart').getContext('2d');
+            
+            new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: ['SP', 'SB', 'SD', 'SBv', 'DSP'],
+                    datasets: [
+                        {
+                            label: 'NTB Revenue',
+                            data: [2850000, 1950000, 2250000, 950000, 950000], 
+                            backgroundColor: '#4285F4', 
+                            borderRadius: 4,
+                            yAxisID: 'y', // Map to Left Axis
+                            barPercentage: 0.6,
+                            categoryPercentage: 0.8
+                        },
+                        {
+                            label: 'NTB Units',
+                            data: [1500, 700, 1280, 400, 200], 
+                            backgroundColor: '#FBBC04', 
+                            borderRadius: 4,
+                            yAxisID: 'y1', // Map to Right Axis
+                            barPercentage: 0.6,
+                            categoryPercentage: 0.8
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { usePointStyle: true, pointStyle: 'circle', padding: 20, font: { size: 14 } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.dataset.yAxisID === 'y') {
+                                        label += '₹' + (context.raw / 100000).toFixed(1) + 'L';
+                                    } else {
+                                        label += context.raw + ' Units';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#555' }
+                        },
+                        // LEFT AXIS (Revenue)
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            beginAtZero: true,
+                            max: 3000000,
+                            grid: { borderDash: [5, 5], color: '#f0f0f0', drawBorder: false },
+                            ticks: {
+                                callback: function(value) {
+                                    if (value === 0) return '₹0';
+                                    return '₹' + (value / 100000).toFixed(1) + 'L';
+                                },
+                                color: '#888'
+                            },
+                            title: { display: true, text: 'Revenue', color: '#999' }
+                        },
+                        // RIGHT AXIS (Units)
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            beginAtZero: true,
+                            max: 1600,
+                            grid: { display: false }, 
+                            ticks: { color: '#888' },
+                            title: { display: true, text: 'Units', color: '#999' }
+                        }
+                    }
+                }
+            });
+
+            // Tab switching logic
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                });
+            });
+        });
+    </script>
+{% endblock %}

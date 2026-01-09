@@ -3,17 +3,36 @@
 
 {% block title %}Path Analysis - AdPulse{% endblock %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/path_analysis.css' %}">
+{% endblock %}
+
 {% block content %}
+
+    <header class="dashboard-header">
+        <div class="header-left">
+            <h2>Hello, User</h2>
+            <p class="current-date">{% now "l, F d, Y" %}</p> 
+        </div>
+        
+        <div class="date-picker-container">
+             <div class="date-picker-btn">
+                <i class="fa-regular fa-calendar"></i>
+                <span>Dec 9, 2025 - Jan 8, 2026</span>
+            </div>
+        </div>
+    </header>
+
     <section class="summary-section">
-        <div class="card summary-card">
+        <div class="summary-card">
             <h3 class="red-text">Spends</h3>
             <div class="value">₹1,26,000</div>
         </div>
-        <div class="card summary-card">
+        <div class="summary-card">
             <h3 class="red-text">Orders</h3>
             <div class="value">4,200</div>
         </div>
-        <div class="card summary-card">
+        <div class="summary-card">
             <h3 class="red-text">Revenue</h3>
             <div class="value">₹9,60,000</div>
         </div>
@@ -30,18 +49,55 @@
                 
                 <div class="path-filters">
                     <div class="filter-row">
-                        <select class="custom-select-small"><option>Last 30 Days</option></select>
-                        <select class="custom-select-small"><option>All Campaigns</option></select>
+                        <div class="filter-group">
+                            <select class="custom-select-small">
+                                <option>Last 30 Days</option>
+                                <option>Last 60 Days</option>
+                                <option>Last 90 Days</option>
+                                <option>Monthly</option>
+                                <option>Yearly</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <select class="custom-select-small">
+                                <option>All Campaigns</option>
+                                <option>Campaign A</option>
+                                <option>Campaign B</option>
+                                <option>Campaign C</option>
+                                <option>Campaign D</option>
+                            </select>
+                        </div>
                         
                         <div class="toggle-pill-container">
                             <button class="toggle-pill-btn active" id="btnNewCust">New Customers</button>
                             <button class="toggle-pill-btn" id="btnRepeatCust">Repeat Customers</button>
                         </div>
 
-                        <select class="custom-select-small"><option>All ASINs</option></select>
+                        <div class="filter-group">
+                            <select class="custom-select-small">
+                                <option>All Campaigns</option>
+                                <option>ASIN 1</option>
+                                <option>ASIN 2</option>
+                                <option>ASIN 3</option>
+                                <option>ASIN 4</option>
+                            </select>
+                        </div>
+
                     </div>
+
                     <div class="filter-row right-align">
-                        <select class="custom-select-small"><option>All Keywords</option></select>
+                        <div class="filter-group">
+                            <select class="custom-select-small">
+                                <option>All Keywords</option>
+                                <option>bluetooth speaker</option>
+                                <option>fitness tracker</option>
+                                <option>noise cancelling headphones</option>
+                                <option>portable speaker</option>
+                                <option>smart watch</option>
+                                <option>wireless earbuds</option>
+                            </select>
+                        </div>
                         <button class="export-btn"><i class="fa-solid fa-download"></i> Export CSV</button>
                     </div>
                 </div>
@@ -51,9 +107,9 @@
                 <table class="path-table">
                     <thead>
                         <tr>
-                            <th width="50%">Path</th>
-                            <th width="25%" class="text-right">NTB Rev. Generated (INR) <i class="fa-solid fa-arrow-down-short-wide"></i></th>
-                            <th width="25%" class="text-right">Median Time to Purchase (Minutes) <i class="fa-solid fa-arrow-down-short-wide"></i></th>
+                            <th width="45%">Path</th>
+                            <th width="25%" class="text-right">NTB Rev. Generated (INR) <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
+                            <th width="30%" class="text-right">Median Time to Purchase (Minutes) <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -143,7 +199,7 @@
                                 7.1 minutes <span class="trend-up"><i class="fa-solid fa-arrow-up"></i></span>
                             </td>
                         </tr>
-                        
+
                         <tr>
                             <td>
                                 <div class="path-sequence">
@@ -187,5 +243,13 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="{% static 'js/pathAnalysisScript.js' %}"></script>
+    <script>
+        // Simple logic for toggle buttons visual state
+        document.querySelectorAll('.toggle-pill-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.toggle-pill-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
 {% endblock %}

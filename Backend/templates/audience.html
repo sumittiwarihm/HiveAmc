@@ -1,54 +1,209 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Audience & Reach - AdPulse{% endblock %}
+{% block title %}Audience and Reach Frequency - AdPulse{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/audience.css' %}">
+{% endblock %}
 
 {% block content %}
+
+    <header class="dashboard-header">
+        <div class="header-left">
+            <h2>Hello, User</h2>
+            <p class="current-date">{% now "l, F d, Y" %}</p> 
+        </div>
+        
+        <div class="date-picker-container">
+             <div class="date-picker-btn">
+                <i class="fa-regular fa-calendar"></i>
+                <span>Dec 9, 2025 - Jan 8, 2026</span>
+            </div>
+        </div>
+    </header>
+
     <section class="summary-section">
-        <div class="card summary-card">
-            <h3 class="red-text">Total Reach</h3>
-            <div class="value">850,000</div>
+        <div class="summary-card">
+            <h3 class="red-text">Spends</h3>
+            <div class="value">₹1,26,000</div>
         </div>
-        <div class="card summary-card">
-            <h3 class="red-text">Avg Frequency</h3>
-            <div class="value">3.2</div>
+        <div class="summary-card">
+            <h3 class="red-text">Orders</h3>
+            <div class="value">4,200</div>
         </div>
-        <div class="card summary-card">
-            <h3 class="red-text">Impressions</h3>
-            <div class="value">2.4M</div>
+        <div class="summary-card">
+            <h3 class="red-text">Revenue</h3>
+            <div class="value">₹9,60,000</div>
         </div>
     </section>
 
-    <div class="section-header-row">
-        <div class="text-group">
-            <h3>Audience and Reach Frequency</h3>
-            <p class="subtitle">Analyze audience reach, unique users, and conversion efficiency</p>
-        </div>
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;">
+
+    <div class="page-header">
+        <h2>Audience and Reach Frequency</h2>
+        <p>Analyze audience reach, unique users, and conversion efficiency</p>
     </div>
 
-    <section class="full-width-section">
-        <div class="card full-width-chart-card">
+    <div class="chart-card">
+        
+        <div class="chart-card-header">
+            <h3>Audience Reach vs Conversion Efficiency</h3>
             
-            <div class="chart-header-flex">
-                <div class="chart-header-text">
-                    <h3>Audience Reach vs Conversion Efficiency</h3>
-                </div>
-                <div class="chart-header-controls">
-                    <select class="custom-select">
-                        <option>Amazon DSP</option>
-                        <option>Sponsored Products</option>
-                        <option>Sponsored Brands</option>
-                    </select>
-                </div>
-            </div>
+            <select class="dsp-dropdown">
+                <option value="amazon_dsp" selected>Amazon DSP</option>
+                <option value="other_dsp">Other DSP</option>
+            </select>
+        </div>
 
-            <div class="chart-container-large">
-                <canvas id="audienceReachChart"></canvas>
+        <div class="audience-chart-container">
+            <canvas id="reachConversionChart"></canvas>
+        </div>
+
+        <div class="chart-footer-stats">
+            <div class="stat-block">
+                <div class="stat-label">Avg Unique Users</div>
+                <div class="stat-value">91,450</div>
+            </div>
+            <div class="stat-block">
+                <div class="stat-label">Avg Conversion Rate</div>
+                <div class="stat-value">3.55%</div>
             </div>
         </div>
-    </section>
+
+    </div>
+
 {% endblock %}
 
 {% block scripts %}
-    <script src="{% static 'js/audienceAndReachScript.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('reachConversionChart').getContext('2d');
+
+            // --- Generating Dummy Data to resemble the screenshot ---
+            // Exposures 1 to 30
+            const labels = Array.from({length: 30}, (_, i) => i + 1);
+
+            // Bar Data (Unique Users) - Teal - Random values between 50k and 130k
+            const uniqueUsersData = labels.map(() => Math.floor(Math.random() * (130000 - 50000 + 1) + 50000));
+            
+            // Line Data (Conversion %) - Yellow - Random values between 2% and 5.5%
+            const conversionRateData = labels.map(() => (Math.random() * (5.5 - 2.0) + 2.0).toFixed(2));
+
+
+            new Chart(ctx, {
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: 'Number of Unique Users',
+                            data: uniqueUsersData,
+                            backgroundColor: '#1abc9c', // Teal color
+                            borderRadius: 4,
+                            barPercentage: 0.7,
+                            categoryPercentage: 0.8,
+                            yAxisID: 'y', // Assign to Left Axis
+                            order: 2 // Ensure bars are behind lines
+                        },
+                        {
+                            type: 'line',
+                            label: 'Impression to Conversion (%)',
+                            data: conversionRateData,
+                            borderColor: '#f1c40f', // Yellow color
+                            backgroundColor: '#f1c40f',
+                            borderWidth: 2,
+                            pointStyle: 'circle',
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            pointBackgroundColor: '#fff', // White fill for points
+                            pointBorderColor: '#f1c40f', // Yellow border for points
+                            pointBorderWidth: 2,
+                            tension: 0.3, // Slight curve to the line
+                            yAxisID: 'y1', // Assign to Right Axis
+                            order: 1 // Ensure line is on top
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'center',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 25,
+                                font: { size: 13 },
+                                color: '#555'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#fff',
+                            titleColor: '#333',
+                            bodyColor: '#333',
+                            borderColor: '#eee',
+                            borderWidth: 1,
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.dataset.yAxisID === 'y1') {
+                                        // Format line data with %
+                                        label += context.parsed.y + '%';
+                                    } else {
+                                        // Format bar data with commas
+                                        label += context.parsed.y.toLocaleString();
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#777' },
+                            title: { display: true, text: 'Exposures', color: '#999', font: {size: 13} }
+                        },
+                        // --- Left Y-Axis (Unique Users) ---
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            beginAtZero: true,
+                            max: 140000, // Match screenshot limit
+                            grid: { borderDash: [5, 5], color: '#f5f5f5', drawBorder: false },
+                            ticks: {
+                                color: '#777',
+                                stepSize: 35000 // Match screenshot steps
+                            },
+                            title: { display: true, text: 'Unique Users', color: '#999', font: {size: 13} }
+                        },
+                        // --- Right Y-Axis (Conversion Rate) ---
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            beginAtZero: true,
+                            max: 8, // Match screenshot limit
+                            grid: { display: false }, // Hide right grid lines to avoid clutter
+                            ticks: {
+                                color: '#777',
+                                callback: function(value) { return value + '%'; } // Add % sign to ticks
+                            },
+                            title: { display: true, text: 'Impression to Conversion Rate (%)', color: '#999', font: {size: 13} }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 {% endblock %}

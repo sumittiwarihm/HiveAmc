@@ -1,0 +1,283 @@
+/* --- Header & Summary (Reusing logic for consistency) --- */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.header-left h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.current-date {
+    color: #666;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.date-picker-container {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #333;
+}
+
+.summary-section {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.summary-card {
+    flex: 1;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+}
+
+.summary-card h3 {
+    font-size: 14px;
+    color: #e74c3c;
+    margin: 0 0 10px 0;
+    font-weight: 500;
+}
+
+.summary-card .value {
+    font-size: 24px;
+    font-weight: 400;
+    color: #2c3e50;
+}
+
+/* --- Path Analysis Card Specifics --- */
+.full-width-section {
+    width: 100%;
+}
+
+.path-table-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+    padding: 20px;
+}
+
+/* Header & Filters Area */
+.path-controls-header {
+    margin-bottom: 25px;
+}
+
+.path-title-group {
+    margin-bottom: 20px;
+}
+
+.path-title-group h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 5px 0;
+}
+
+.path-title-group .subtitle {
+    font-size: 13px;
+    color: #7f8c8d;
+    margin: 0;
+}
+
+.path-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.filter-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filter-row.right-align {
+    justify-content: flex-end;
+}
+
+/* Form Elements */
+.custom-select-small {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #555;
+    background-color: #f9f9f9;
+    outline: none;
+    min-width: 130px;
+}
+
+.export-btn {
+    padding: 6px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    color: #555;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.export-btn:hover {
+    background: #f0f0f0;
+}
+
+/* Toggle Pills (New/Repeat) */
+.toggle-pill-container {
+    display: flex;
+    background: #f1f3f5;
+    padding: 3px;
+    border-radius: 6px;
+}
+
+.toggle-pill-btn {
+    border: none;
+    background: transparent;
+    padding: 5px 15px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #666;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.toggle-pill-btn.active {
+    background: #fff;
+    color: #2962ff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* --- Table Styles --- */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.path-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.path-table th {
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    text-transform: uppercase;
+}
+
+.path-table th.text-right {
+    text-align: right;
+}
+
+.path-table td {
+    padding: 15px;
+    border-bottom: 1px solid #f5f5f5;
+    vertical-align: middle;
+    color: #333;
+    font-size: 14px;
+}
+
+.path-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.sort-icon {
+    font-size: 11px;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+/* Path Badges */
+.path-sequence {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.arrow-icon {
+    color: #ccc;
+    font-size: 12px;
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: white;
+    white-space: nowrap;
+}
+
+/* Badge Colors based on screenshot */
+.badge-search {
+    background-color: #4285f4; /* Blue */
+}
+
+.badge-sp {
+    background-color: #ff5252; /* Red/Pink */
+}
+
+.badge-dsp {
+    background-color: #ff9800; /* Orange */
+}
+
+.badge-social {
+    background-color: #7c4dff; /* Purple */
+}
+
+/* Data Column Styling */
+.text-right {
+    text-align: right;
+}
+
+.value-primary {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+/* Spark Bar (Blue underline/bar) */
+.spark-bar {
+    height: 3px;
+    background-color: #2962ff;
+    border-radius: 2px;
+    margin-left: auto; /* Aligns bar to right since container is text-right */
+}
+
+/* Trends */
+.trend-up {
+    color: #00c853; /* Green */
+    font-size: 12px;
+    margin-left: 5px;
+}
+
+.trend-down {
+    color: #ff5252; /* Red */
+    font-size: 12px;
+    margin-left: 5px;
+}

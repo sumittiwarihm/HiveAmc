@@ -3,110 +3,223 @@
 
 {% block title %}Ad Type Overlap - AdPulse{% endblock %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/ad_overlap.css' %}">
+{% endblock %}
+
 {% block content %}
+
+    <header class="dashboard-header">
+        <div class="header-left">
+            <h2>Hello, User</h2>
+            <p class="current-date">{% now "l, F d, Y" %}</p> 
+        </div>
+        
+        <div class="date-picker-container">
+             <div class="date-picker-btn">
+                <i class="fa-regular fa-calendar"></i>
+                <span>Dec 9, 2025 - Jan 8, 2026</span>
+            </div>
+        </div>
+    </header>
+
     <section class="summary-section">
-        <div class="card summary-card">
+        <div class="summary-card">
             <h3 class="red-text">Spends</h3>
             <div class="value">₹1,26,000</div>
         </div>
-        <div class="card summary-card">
+        <div class="summary-card">
             <h3 class="red-text">Orders</h3>
             <div class="value">4,200</div>
         </div>
-        <div class="card summary-card">
+        <div class="summary-card">
             <h3 class="red-text">Revenue</h3>
             <div class="value">₹9,60,000</div>
         </div>
     </section>
 
-    <section class="overlap-section">
-        
-        <div class="overlap-header-container">
-            <div class="center-text-block">
-                <h3>Ad Type Overlap</h3>
-                <p class="subtitle">Visualize purchase rate overlap between ad types by customer cohort and campaign</p>
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;">
+
+    <div class="page-center-header">
+        <h2>Ad Type Overlap</h2>
+        <p>Visualize purchase rate overlap between ad types by customer cohort and campaign</p>
+    </div>
+
+    <div class="filter-bar">
+        <div class="filter-group">
+            <select class="custom-select">
+                <option>Last 30 Days</option>
+                <option>Last 60 Days</option>
+                <option>Last 90 Days</option>
+                <option>Monthly</option>
+                <option>Yearly</option>
+            </select>
+        </div>
+
+        <div class="filter-group toggle-group">
+            <button class="toggle-btn active" data-type="new">New Customers</button>
+            <button class="toggle-btn" data-type="repeat">Repeat Customers</button>
+        </div>
+
+        <div class="filter-group">
+            <select class="custom-select">
+                <option>Campaign: Overall Campaigns</option>
+                <option>Campaign A</option>
+                <option>Campaign B</option>
+                <option>Campaign C</option>
+                <option>Campaign D</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="visualization-card">
+        <h3>Purchase Rate by Ad Type</h3>
+        <p class="sub-title">Visual representation of purchase performance overlap between ad types</p>
+
+        <div class="venn-container">
+            <div class="venn-circle circle-left">
+                <div class="content">
+                    <span class="label">Search</span>
+                    <span class="sub-label">Purchase Rate</span>
+                    <span class="percentage" id="val-search">3.2%</span>
+                </div>
             </div>
 
-            <div class="overlap-controls-row">
-                <button class="control-pill"><i class="fa-regular fa-calendar"></i> Last 30 Days <i class="fa-solid fa-chevron-down"></i></button>
-                
-                <div class="segmented-control">
-                    <button class="segment-btn active" id="btnNew">New Customers</button>
-                    <button class="segment-btn" id="btnRepeat">Repeat Customers</button>
+            <div class="venn-circle circle-right">
+                <div class="content">
+                    <span class="label">DSP</span>
+                    <span class="sub-label">Purchase Rate</span>
+                    <span class="percentage" id="val-dsp">2.3%</span>
                 </div>
-
-                <button class="control-pill">Campaign: Overall Campaigns <i class="fa-solid fa-chevron-down"></i></button>
+            </div>
+            
+            <div class="venn-overlap">
+                <div class="content">
+                    <span class="label">Search + DSP</span>
+                    <span class="sub-label">Purchase Rate</span>
+                    <span class="percentage" id="val-overlap">6.7%</span>
+                </div>
             </div>
         </div>
 
-        <div class="card venn-layout-card">
-            <div class="chart-header-center">
-                <h4>Purchase Rate by Ad Type</h4>
-                <p>Visual representation of purchase performance overlap between ad types</p>
-            </div>
-
-            <div class="venn-wrapper">
-                <div class="venn-circle blue-circle">
-                    <div class="v-content v-left">
-                        <span class="v-title">Search</span>
-                        <span class="v-sub">Purchase Rate</span>
-                        <span class="v-num">3.2%</span>
-                    </div>
-                </div>
-
-                <div class="venn-circle green-circle">
-                    <div class="v-content v-right">
-                        <span class="v-title">DSP</span>
-                        <span class="v-sub">Purchase Rate</span>
-                        <span class="v-num">2.3%</span>
-                    </div>
-                </div>
-                
-                <div class="overlap-label">
-                    <span class="v-title-small">Search + DSP</span>
-                    <span class="v-sub-small">Purchase Rate</span>
-                    <span class="v-num-small">6.7%</span>
-                </div>
-            </div>
-
-            <div class="insight-pill">
-                <div class="bulb-icon"><i class="fa-regular fa-lightbulb"></i></div>
-                <p>New customers show moderate overlap (<strong>6.7%</strong>) between Search and DSP channels, indicating opportunity for increased cross-channel exposure.</p>
-            </div>
+        <div class="insight-box">
+            <i class="fa-regular fa-lightbulb"></i>
+            <p id="insight-text">
+                New customers show moderate overlap (6.7%) between Search and DSP channels, indicating opportunity for increased cross-channel exposure and multi-touch attribution strategies.
+            </p>
         </div>
 
-        <div class="overlap-metrics-row">
-            <div class="card metric-box">
-                <div class="mb-header">
-                    <span>Search Ad Type</span>
-                    <div class="dot dot-blue"></div>
+        <div class="stats-cards-row">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h3>Search Ad Type</h3>
+                    <span class="dot-icon blue"></span>
                 </div>
-                <div class="mb-stat">3.2%</div>
-                <div class="mb-sub">4,850 users · 155 conversions</div>
+                <div class="stat-value" id="card-search-val">3.2%</div>
+                <p class="stat-sub" id="card-search-sub">4,850 users · 155 conversions</p>
             </div>
-
-            <div class="card metric-box">
-                <div class="mb-header">
-                    <span>Search + DSP Overlap</span>
-                    <div class="dot dot-teal"></div>
+            
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h3>Search + DSP Overlap</h3>
+                    <span class="dot-icon teal"></span>
                 </div>
-                <div class="mb-stat">6.7%</div>
-                <div class="mb-sub">5,240 users · 351 conversions</div>
+                <div class="stat-value" id="card-overlap-val">6.7%</div>
+                <p class="stat-sub" id="card-overlap-sub">5,240 users · 351 conversions</p>
             </div>
-
-            <div class="card metric-box">
-                <div class="mb-header">
-                    <span>DSP Ad Type</span>
-                    <div class="dot dot-green"></div>
+            
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h3>DSP Ad Type</h3>
+                    <span class="dot-icon green"></span>
                 </div>
-                <div class="mb-stat">2.3%</div>
-                <div class="mb-sub">3,920 users · 90 conversions</div>
+                <div class="stat-value" id="card-dsp-val">2.3%</div>
+                <p class="stat-sub" id="card-dsp-sub">3,920 users · 90 conversions</p>
             </div>
         </div>
+    </div>
 
-    </section>
 {% endblock %}
 
 {% block scripts %}
-    <script src="{% static 'js/adTypeOverlapScript.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Data for simulation
+            const data = {
+                new: {
+                    search: '3.2%',
+                    dsp: '2.3%',
+                    overlap: '6.7%',
+                    insight: 'New customers show moderate overlap (6.7%) between Search and DSP channels, indicating opportunity for increased cross-channel exposure.',
+                    // New data for cards
+                    searchSub: '4,850 users · 155 conversions',
+                    dspSub: '3,920 users · 90 conversions',
+                    overlapSub: '5,240 users · 351 conversions'
+                },
+                repeat: {
+                    search: '5.8%',
+                    dsp: '4.1%',
+                    overlap: '12.4%',
+                    insight: 'Repeat customers demonstrate high cross-channel engagement (12.4%), suggesting that retargeting across both DSP and Search drives higher loyalty.',
+                    // New data for cards
+                    searchSub: '8,120 users · 470 conversions',
+                    dspSub: '6,500 users · 266 conversions',
+                    overlapSub: '9,800 users · 1,215 conversions'
+                }
+            };
+
+            const toggles = document.querySelectorAll('.toggle-btn');
+            // Venn diagram elements
+            const valSearch = document.getElementById('val-search');
+            const valDsp = document.getElementById('val-dsp');
+            const valOverlap = document.getElementById('val-overlap');
+            const insightText = document.getElementById('insight-text');
+            // New card elements
+            const cardSearchVal = document.getElementById('card-search-val');
+            const cardSearchSub = document.getElementById('card-search-sub');
+            const cardDspVal = document.getElementById('card-dsp-val');
+            const cardDspSub = document.getElementById('card-dsp-sub');
+            const cardOverlapVal = document.getElementById('card-overlap-val');
+            const cardOverlapSub = document.getElementById('card-overlap-sub');
+
+            toggles.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // 1. Remove active class from all
+                    toggles.forEach(b => b.classList.remove('active'));
+                    // 2. Add active class to clicked
+                    this.classList.add('active');
+
+                    // 3. Update Data
+                    const type = this.getAttribute('data-type');
+                    const selectedData = data[type];
+
+                    // Simple animation effect for venn diagram
+                    valSearch.style.opacity = 0;
+                    valDsp.style.opacity = 0;
+                    valOverlap.style.opacity = 0;
+
+                    setTimeout(() => {
+                        // Update Venn Diagram & Insight
+                        valSearch.innerText = selectedData.search;
+                        valDsp.innerText = selectedData.dsp;
+                        valOverlap.innerText = selectedData.overlap;
+                        insightText.innerText = selectedData.insight;
+
+                        // Update New Cards
+                        cardSearchVal.innerText = selectedData.search;
+                        cardSearchSub.innerText = selectedData.searchSub;
+                        cardDspVal.innerText = selectedData.dsp;
+                        cardDspSub.innerText = selectedData.dspSub;
+                        cardOverlapVal.innerText = selectedData.overlap;
+                        cardOverlapSub.innerText = selectedData.overlapSub;
+
+                        // Fade in venn diagram
+                        valSearch.style.opacity = 1;
+                        valDsp.style.opacity = 1;
+                        valOverlap.style.opacity = 1;
+                    }, 200);
+                });
+            });
+        });
+    </script>
 {% endblock %}

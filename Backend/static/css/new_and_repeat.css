@@ -1,0 +1,205 @@
+/* --- Page Layout --- */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.header-left h2 {
+    font-size: 24px;
+    color: #333;
+    margin: 0;
+}
+
+.header-left .current-date {
+    color: #777;
+    margin-top: 5px;
+    font-size: 14px;
+}
+
+/* --- Date Picker Mockup --- */
+.date-picker-btn {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+}
+
+/* --- Top Summary Cards --- */
+.summary-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.summary-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.summary-card h3 {
+    color: #e74c3c;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.summary-card .value {
+    font-size: 22px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* --- Analysis Section Header --- */
+.analysis-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 25px;
+}
+
+.analysis-title h2 {
+    font-size: 18px;
+    margin-bottom: 5px;
+    color: #2c3e50;
+    margin-top: 0;
+}
+
+.analysis-title p {
+    font-size: 13px;
+    color: #7f8c8d;
+    margin: 0;
+}
+
+.toggle-tabs {
+    display: flex;
+    background: #fff;
+    border-radius: 8px;
+    padding: 4px;
+    border: 1px solid #eee;
+}
+
+.tab-btn {
+    padding: 8px 20px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    color: #555;
+    position: relative;
+}
+
+.tab-btn.active {
+    color: #2980b9;
+    font-weight: 600;
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 20px;
+    right: 20px;
+    height: 2px;
+    background-color: #2980b9;
+}
+
+/* --- Detailed Metrics Grid --- */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.metric-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.metric-info h4 {
+    margin: 0;
+    font-size: 13px;
+    color: #777;
+    font-weight: 500;
+}
+
+.metric-info .metric-value {
+    margin-top: 8px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.metric-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+}
+
+/* Icon Colors */
+.icon-green { background-color: #e8f8f5; color: #2ecc71; }
+.icon-blue { background-color: #eaf2f8; color: #3498db; }
+.icon-purple { background-color: #f4ecf7; color: #9b59b6; }
+.icon-orange { background-color: #fef5e7; color: #f39c12; }
+.icon-indigo { background-color: #e8daef; color: #8e44ad; }
+.icon-pink { background-color: #fdedec; color: #e74c3c; }
+.icon-teal { background-color: #e0f2f1; color: #009688; }
+.icon-cyan { background-color: #e0f7fa; color: #00bcd4; }
+
+/* --- Chart Sections --- */
+.chart-section {
+    margin-top: 30px;
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.chart-header {
+    margin-bottom: 25px;
+}
+
+.chart-header h3 {
+    font-size: 18px;
+    color: #2c3e50;
+    margin: 0 0 5px 0;
+}
+
+.chart-header p {
+    font-size: 13px;
+    color: #7f8c8d;
+    margin: 0;
+}
+
+.chart-container {
+    position: relative;
+    height: 400px;
+    width: 100%;
+}
