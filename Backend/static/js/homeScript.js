@@ -1,6 +1,19 @@
+
+function getdate(){
+    const today = new Date();
+
+const formattedDate = today.toLocaleDateString('en-US', {
+  weekday: 'long',
+  month: 'long',
+  day: '2-digit',
+  year: 'numeric'
+});
+return formattedDate;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log("Home Script Loaded");
-
+    document.getElementById('Greetingdate').innerText = getdate();
     // 1. Check if data exists
     if (typeof chartData === 'undefined' || chartData.labels.length === 0) {
         console.warn("No data found for charts in this date range.");
@@ -62,3 +75,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+
