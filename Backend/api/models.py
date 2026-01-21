@@ -5,6 +5,7 @@ class DodTable(models.Model):
     analysisType = models.CharField(max_length=255)
     date = models.DateField()
     adProductType = models.CharField(max_length=255)
+    userPurchased = models.DecimalField(max_digits=20, decimal_places=2,default=None)
     impression = models.DecimalField(max_digits=20, decimal_places=2)
     clicks = models.DecimalField(max_digits=20, decimal_places=2)
     spend = models.DecimalField(max_digits=20, decimal_places=2)

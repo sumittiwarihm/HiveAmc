@@ -299,7 +299,7 @@ def ad_overlap(request):
     # ---------------------------------------
     # 2. OVERLAP FILTER DROPDOWN
     # ---------------------------------------
-    overlap_range = request.GET.get("overlap_range", "last30")
+    overlap_range = request.GET.get("overlap_range", "yearly")
     today = date.today()
 
     if overlap_range == "last30":
