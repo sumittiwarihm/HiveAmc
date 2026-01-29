@@ -6,85 +6,27 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/ad_overlap.css' %}">
 <style>
-    .range-dropdown {
-        padding: 8px 14px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        font-size: 14px;
-        cursor: pointer;
-        background: white;
+    .filter-section { display: flex; justify-content: center; margin-bottom: 30px; }
+    .filter-card {
+        background: #fff; border: 1px solid #e0e0e0; padding: 10px 20px; border-radius: 50px;
+        display: flex; align-items: center; gap: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.03);
     }
-    /* --- NEW HEADER STYLES --- */
-        .page-header {
-            display: flex;
-            justify-content: space-between; /* Left aur Right content ko alag karta hai */
-            align-items: center;
-            margin-bottom: 25px;
-            padding: 0 5px;
-        }
-
-        .header-left h1 {
-            font-size: 24px;
-            margin: 0;
-            color: #333;
-            font-weight: 600;
-        }
-
-        .header-left .sub-text {
-            margin: 5px 0 0 0;
-            color: #888;
-            font-size: 14px;
-        }
-
-        /* Right Side Form Styling */
-        .top-date-form {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #fff;
-            padding: 8px 15px;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .date-input-group {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .label-text {
-            font-size: 13px;
-            font-weight: 600;
-            color: #555;
-        }
-
-        .top-date-form input[type="date"] {
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 5px;
-            font-size: 13px;
-            color: #333;
-            outline: none;
-            font-family: inherit;
-        }
-
-        .filter-btn {
-            background-color: #333; /* Dark button */
-            color: white;
-            border: none;
-            padding: 6px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            margin-left: 5px;
-            transition: background 0.2s;
-        }
-
-        .filter-btn:hover {
-            background-color: #000;
-        }
+    .mode-group { display: flex; gap: 10px; border-right: 1px solid #eee; padding-right: 20px; }
+    .mode-btn {
+        padding: 6px 15px; border-radius: 20px; font-size: 13px; font-weight: 600;
+        cursor: pointer; border: 1px solid transparent; transition: all 0.2s; color: #666;
+    }
+    .mode-btn.active { background: #333; color: white; }
+    .range-select {
+        padding: 8px 15px; border: 1px solid #ddd; border-radius: 20px; font-size: 14px;
+        outline: none; background: #fff; cursor: pointer; min-width: 180px;
+    }
+    .hidden { display: none !important; }
+    
+    /* Summary Card Styles */
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    .top-date-form { display: flex; align-items: center; gap: 10px; background: #fff; padding: 8px 15px; border-radius: 8px; border: 1px solid #e0e0e0; }
+    .filter-btn { background-color: #333; color: white; border: none; padding: 6px 15px; border-radius: 4px; cursor: pointer; }
 </style>
 {% endblock %}
 
@@ -95,10 +37,11 @@
         <h2>Hello, User</h2>
         <p class="current-date">{% now "l, F d, Y" %}</p>
     </div>
-
-    <!-- ORIGINAL SUMMARY FILTER (UNCHANGED) -->
     <div class="header-right">
         <form method="GET" action="" class="top-date-form">
+            <input type="hidden" name="filter_mode" value="{{ filter_mode }}">
+            <input type="hidden" name="overlap_range" value="{{ overlap_range }}">
+            <input type="hidden" name="selected_month" value="{{ selected_month }}">
             <div class="date-input-group">
                 <span class="label-text">Start:</span>
                 <input type="date" name="start" value="{{ current_start }}" required>
@@ -113,18 +56,9 @@
 </header>
 
 <section class="summary-section">
-    <div class="summary-card">
-        <h3 class="red-text">Spends</h3>
-        <div class="value">₹{{ spends }}</div>
-    </div>
-    <div class="summary-card">
-        <h3 class="red-text">Orders</h3>
-        <div class="value">{{ orders }}</div>
-    </div>
-    <div class="summary-card">
-        <h3 class="red-text">Revenue</h3>
-        <div class="value">₹{{ revenue }}</div>
-    </div>
+    <div class="summary-card"><h3>Spends</h3><div class="value">₹{{ spends }}</div></div>
+    <div class="summary-card"><h3>Orders</h3><div class="value">{{ orders }}</div></div>
+    <div class="summary-card"><h3>Revenue</h3><div class="value">₹{{ revenue }}</div></div>
 </section>
 
 <hr style="margin: 30px 0;">
@@ -133,17 +67,35 @@
     <h2>Ad Type Overlap</h2>
 </div>
 
-<!-- NEW DROPDOWN FILTER JUST FOR OVERLAP SECTION -->
-<div style="display: flex; justify-content: center; margin-bottom: 20px;">
-    <form method="GET" id="overlapForm">
-        <select name="overlap_range" class="range-dropdown" onchange="document.getElementById('overlapForm').submit()">
-            <option value="last30" {% if overlap_range == 'last30' %}selected{% endif %}>Last 30 Days</option>
-            <option value="last60" {% if overlap_range == 'last60' %}selected{% endif %}>Last 60 Days</option>
-            <option value="last90" {% if overlap_range == 'last90' %}selected{% endif %}>Last 90 Days</option>
-            <option value="monthly" {% if overlap_range == 'monthly' %}selected{% endif %}>Monthly</option>
-            <option value="yearly" {% if overlap_range == 'yearly' %}selected{% endif %}>Yearly</option>
-            <option value="all" {% if overlap_range == 'all' %}selected{% endif %}>All Time</option>
-        </select>
+<div class="filter-section">
+    <form method="GET" id="overlapForm" class="filter-card">
+        <input type="hidden" name="start" value="{{ current_start }}">
+        <input type="hidden" name="end" value="{{ current_end }}">
+        
+        <input type="hidden" name="filter_mode" id="filter_mode_input" value="{{ filter_mode }}">
+
+        <div class="mode-group">
+            <div class="mode-btn {% if filter_mode == 'range' %}active{% endif %}" onclick="setMode('range')">Quick Range</div>
+            <div class="mode-btn {% if filter_mode == 'month' %}active{% endif %}" onclick="setMode('month')">Specific Month</div>
+        </div>
+
+        <div id="rangeDropdownArea" class="{% if filter_mode == 'month' %}hidden{% endif %}">
+            <select name="overlap_range" class="range-select" onchange="this.form.submit()">
+                <option value="all" {% if overlap_range == 'all' %}selected{% endif %}>All Time</option>
+                <option value="last30" {% if overlap_range == 'last30' %}selected{% endif %}>Last 30 Days</option>
+                <option value="last60" {% if overlap_range == 'last60' %}selected{% endif %}>Last 60 Days</option>
+                <option value="last90" {% if overlap_range == 'last90' %}selected{% endif %}>Last 90 Days</option>
+            </select>
+        </div>
+
+        <div id="monthDropdownArea" class="{% if filter_mode == 'range' %}hidden{% endif %}">
+            <select name="selected_month" class="range-select" onchange="this.form.submit()">
+                <option value="">-- Select Month --</option>
+                {% for month in available_months %}
+                    <option value="{{ month }}" {% if selected_month == month %}selected{% endif %}>{{ month }}</option>
+                {% endfor %}
+            </select>
+        </div>
     </form>
 </div>
 
@@ -156,41 +108,16 @@
 
 <div class="visualization-card">
     <h3>Purchase Rate by Ad Type</h3>
-
     <div class="venn-container">
-        <div class="venn-circle circle-left">
-            <span class="percentage" id="val-search">0%</span>
-        </div>
-        <div class="venn-circle circle-right">
-            <span class="percentage" id="val-dsp">0%</span>
-        </div>
-        <div class="venn-overlap">
-            <span class="percentage" id="val-overlap">0%</span>
-        </div>
+        <div class="venn-circle circle-left"><span class="percentage" id="val-search">0%</span></div>
+        <div class="venn-circle circle-right"><span class="percentage" id="val-dsp">0%</span></div>
+        <div class="venn-overlap"><span class="percentage" id="val-overlap">0%</span></div>
     </div>
-
-    <div class="insight-box">
-        <p id="insight-text">Loading...</p>
-    </div>
-
+    <div class="insight-box"><p id="insight-text">Loading...</p></div>
     <div class="stats-cards-row">
-        <div class="stat-card">
-            <h3>Search</h3>
-            <div class="stat-value" id="card-search-val">0%</div>
-            <p id="card-search-sub">0 users · 0 conversions</p>
-        </div>
-
-        <div class="stat-card">
-            <h3>Search + DSP Overlap</h3>
-            <div class="stat-value" id="card-overlap-val">0%</div>
-            <p id="card-overlap-sub">0 users · 0 conversions</p>
-        </div>
-
-        <div class="stat-card">
-            <h3>DSP</h3>
-            <div class="stat-value" id="card-dsp-val">0%</div>
-            <p id="card-dsp-sub">0 users · 0 conversions</p>
-        </div>
+        <div class="stat-card"><h3>Search</h3><div class="stat-value" id="card-search-val">0%</div><p id="card-search-sub">0 users</p></div>
+        <div class="stat-card"><h3>Overlap</h3><div class="stat-value" id="card-overlap-val">0%</div><p id="card-overlap-sub">0 users</p></div>
+        <div class="stat-card"><h3>DSP</h3><div class="stat-value" id="card-dsp-val">0%</div><p id="card-dsp-sub">0 users</p></div>
     </div>
 </div>
 
@@ -198,39 +125,40 @@
 
 {% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+// Logic to handle mode switching
+function setMode(mode) {
+    document.getElementById('filter_mode_input').value = mode;
+    
+    // Toggle visual buttons
+    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+    event.currentTarget.classList.add('active');
 
+    // Toggle dropdown visibility
+    if (mode === 'range') {
+        document.getElementById('rangeDropdownArea').classList.remove('hidden');
+        document.getElementById('monthDropdownArea').classList.add('hidden');
+    } else {
+        document.getElementById('rangeDropdownArea').classList.add('hidden');
+        document.getElementById('monthDropdownArea').classList.remove('hidden');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
     const data = {{ overlap_data|safe }};
     const toggles = document.querySelectorAll('.toggle-btn');
 
-    const valSearch = document.getElementById('val-search');
-    const valDsp = document.getElementById('val-dsp');
-    const valOverlap = document.getElementById('val-overlap');
-    const insightText = document.getElementById('insight-text');
-
-    const cardSearchVal = document.getElementById('card-search-val');
-    const cardSearchSub = document.getElementById('card-search-sub');
-    const cardDspVal = document.getElementById('card-dsp-val');
-    const cardDspSub = document.getElementById('card-dsp-sub');
-    const cardOverlapVal = document.getElementById('card-overlap-val');
-    const cardOverlapSub = document.getElementById('card-overlap-sub');
-
     function updateUI(type) {
         const d = data[type];
-
-        valSearch.innerText = d.search;
-        valDsp.innerText = d.dsp;
-        valOverlap.innerText = d.overlap;
-        insightText.innerText = d.insight;
-
-        cardSearchVal.innerText = d.search;
-        cardSearchSub.innerText = d.searchSub;
-
-        cardDspVal.innerText = d.dsp;
-        cardDspSub.innerText = d.dspSub;
-
-        cardOverlapVal.innerText = d.overlap;
-        cardOverlapSub.innerText = d.overlapSub;
+        document.getElementById('val-search').innerText = d.search;
+        document.getElementById('val-dsp').innerText = d.dsp;
+        document.getElementById('val-overlap').innerText = d.overlap;
+        document.getElementById('insight-text').innerText = d.insight;
+        document.getElementById('card-search-val').innerText = d.search;
+        document.getElementById('card-search-sub').innerText = d.searchSub;
+        document.getElementById('card-dsp-val').innerText = d.dsp;
+        document.getElementById('card-dsp-sub').innerText = d.dspSub;
+        document.getElementById('card-overlap-val').innerText = d.overlap;
+        document.getElementById('card-overlap-sub').innerText = d.overlapSub;
     }
 
     toggles.forEach(btn => {
@@ -240,7 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
             updateUI(this.dataset.type);
         });
     });
-
     updateUI("new");
 });
 </script>

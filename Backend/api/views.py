@@ -272,13 +272,14 @@ def parse_monthyear(text):
 # MAIN VIEW
 # ---------------------------------------
 
+from django.shortcuts import render
+from django.db.models import Sum
+from datetime import date, datetime, timedelta
+from collections import defaultdict
+import json
+
 def ad_overlap(request):
-
-    # ---------------------------------------
-    # 1. TOP SUMMARY CARD FILTER (DodTable)
-    # ---------------------------------------
-    from datetime import datetime
-
+    # --- 1. TOP SUMMARY CARD FILTER ---
     req_start = request.GET.get("start")
     req_end = request.GET.get("end")
 
@@ -286,8 +287,8 @@ def ad_overlap(request):
         start_date = datetime.strptime(req_start, "%Y-%m-%d").date()
         end_date = datetime.strptime(req_end, "%Y-%m-%d").date()
     else:
-        start_date = date.today().replace(day=1)
-        end_date = date.today()
+        end_date = date(2025, 1, 2)
+        start_date = date(2025, 12, 1)
 
     summary_qs = DodTable.objects.filter(date__range=[start_date, end_date])
     summary = summary_qs.aggregate(
@@ -296,86 +297,67 @@ def ad_overlap(request):
         total_revenue=Sum("sales", default=0),
     )
 
-    # ---------------------------------------
-    # 2. OVERLAP FILTER DROPDOWN
-    # ---------------------------------------
-    overlap_range = request.GET.get("overlap_range", "yearly")
-    today = date.today()
-
-    if overlap_range == "last30":
-        overlap_start = today - timedelta(days=30)
-    elif overlap_range == "last60":
-        overlap_start = today - timedelta(days=60)
-    elif overlap_range == "last90":
-        overlap_start = today - timedelta(days=90)
-    elif overlap_range == "monthly":
-        overlap_start = date(today.year, today.month, 1)
-    elif overlap_range == "yearly":
-        overlap_start = today.replace(year=today.year - 1)
-    else:
-        overlap_start = date(2000, 1, 1)  # All time
-
-    # Convert range to comparable keys (YYYYMM)
-    start_key = int(overlap_start.strftime("%Y%m"))
-    end_key = int(today.strftime("%Y%m"))
-
-    # ---------------------------------------
-    # 3. FILTER AudienceOverlap BY RANGE
-    # ---------------------------------------
+    # --- 2. OVERLAP SELECTION LOGIC ---
+    # Default to 'range' mode if nothing is selected
+    filter_mode = request.GET.get("filter_mode", "range") 
+    overlap_range = request.GET.get("overlap_range", "all")
+    selected_month = request.GET.get("selected_month", "") 
+    
+    available_months = AudienceOverlap.objects.values_list('monthYear', flat=True).distinct().order_by('-monthYear')
     overlap_all = AudienceOverlap.objects.all()
+    overlap_qs = []
 
-    overlap_qs = [
-        row for row in overlap_all
-        if start_key <= parse_monthyear(row.monthYear) <= end_key
-    ]
+    # Priority Filtering
+    if filter_mode == "month" and selected_month:
+        overlap_qs = [row for row in overlap_all if row.monthYear == selected_month]
+    else:
+        # Range logic (default)
+        today = date.today()
+        if overlap_range == "last30":
+            overlap_start = today - timedelta(days=30)
+        elif overlap_range == "last60":
+            overlap_start = today - timedelta(days=60)
+        elif overlap_range == "last90":
+            overlap_start = today - timedelta(days=90)
+        else:
+            overlap_start = date(2000, 1, 1)  
 
-    # ---------------------------------------
-    # 4. BUILD DATA FOR NEW/REPEAT
-    # ---------------------------------------
-    data = {
-        "new": defaultdict(default_bucket),
-        "repeat": defaultdict(default_bucket),
-    }
+        start_key = int(overlap_start.strftime("%Y%m"))
+        end_key = int(today.strftime("%Y%m"))
+        overlap_qs = [
+            row for row in overlap_all
+            if start_key <= parse_monthyear(row.monthYear) <= end_key
+        ]
 
+    # --- 3. BUILD DATA FOR NEW/REPEAT ---
+    data = { "new": defaultdict(default_bucket), "repeat": defaultdict(default_bucket) }
     for row in overlap_qs:
         cohort = "new" if row.flagNewToBrand else "repeat"
         bucket = classify_exposure(row.exposureGroup)
-
         data[cohort][bucket]["users"] += float(row.uniqueReach or 0)
         data[cohort][bucket]["conversions"] += float(row.purchases or 0)
 
-    # Format for JS
     overlap_context = {}
-
     for cohort in ["new", "repeat"]:
-        s = data[cohort]["search"]
-        d = data[cohort]["dsp"]
-        o = data[cohort]["overlap"]
-
+        s, d, o = data[cohort]["search"], data[cohort]["dsp"], data[cohort]["overlap"]
         overlap_context[cohort] = {
-            "search": rate(s),
-            "dsp": rate(d),
-            "overlap": rate(o),
+            "search": rate(s), "dsp": rate(d), "overlap": rate(o),
             "searchSub": f"{int(s['users']):,} users · {int(s['conversions']):,} conversions",
             "dspSub": f"{int(d['users']):,} users · {int(d['conversions']):,} conversions",
             "overlapSub": f"{int(o['users']):,} users · {int(o['conversions']):,} conversions",
             "insight": f"{cohort.title()} customers show {rate(o)} cross-channel overlap."
         }
 
-    # ---------------------------------------
-    # FINAL CONTEXT
-    # ---------------------------------------
     context = {
-        # Summary cards
         "current_start": start_date.strftime("%Y-%m-%d"),
         "current_end": end_date.strftime("%Y-%m-%d"),
         "spends": "{:,.2f}".format(summary["total_spends"]),
         "orders": "{:,.0f}".format(summary["total_orders"]),
         "revenue": "{:,.2f}".format(summary["total_revenue"]),
-
-        # Overlap section
+        "filter_mode": filter_mode,
         "overlap_range": overlap_range,
+        "selected_month": selected_month,
+        "available_months": available_months,
         "overlap_data": json.dumps(overlap_context),
     }
-
     return render(request, "ad_overlap.html", context)
