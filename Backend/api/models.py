@@ -82,3 +82,16 @@ class AudienceOverlap(models.Model):
 
     def __str__(self):
         return f"{self.account} - {self.monthYear} ({'New-to-Brand' if self.flagNewToBrand else 'Repeat'})"
+    
+class ReachFrequencyAnalysis(models.Model):
+    account = models.CharField(max_length=255)
+    monthYear = models.CharField(max_length=255)
+    frequency = models.CharField(max_length=255)
+    reach = models.DecimalField(max_digits=20, decimal_places=2)
+    impressions = models.DecimalField(max_digits=20, decimal_places=2)
+    purchases = models.DecimalField(max_digits=20, decimal_places=2)
+    totalPurchases = models.DecimalField(max_digits=20, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.account} - {self.monthYear}"
+    

@@ -5,7 +5,7 @@ from django.db.models import Sum
 from django.db.models.functions import TruncDate
 from django.core.serializers.json import DjangoJSONEncoder
 import json
-from .models import DodTable, PathToPurchaseMonthLevel, PathToPurchaseCampaignMom, AudienceOverlap
+from .models import DodTable, PathToPurchaseMonthLevel, PathToPurchaseCampaignMom, AudienceOverlap,ReachFrequencyAnalysis
 
 # Other views
 def audience(request):
@@ -149,6 +149,7 @@ def new_and_repeat(request):
     }
 
     return render(request, 'new_and_repeat.html', context)
+
 def home(request):
     # --- 1. Date Logic ---
     end_date = date(2025, 12, 29)
@@ -205,6 +206,129 @@ def home(request):
     
     return render(request, 'home.html', context)
 
+def reach_and_frequency(request):
+
+    # --- 1. Date Logic ---
+
+    start_date = date(2025, 1, 1)
+    end_date = date(2026, 12, 29)
+
+    req_start = request.GET.get('start')
+    req_end = request.GET.get('end')
+
+    if req_start and req_end:
+        try:
+            start_date = timezone.datetime.strptime(req_start, '%Y-%m-%d').date()
+            end_date = timezone.datetime.strptime(req_end, '%Y-%m-%d').date()
+        except ValueError:
+            pass
+
+    # --- 2. Summary Data (DodTable) ---
+    summary_queryset = DodTable.objects.filter(date__range=[start_date, end_date])
+    summary = summary_queryset.aggregate(
+        total_spends=Sum('spend', default=0),
+        total_orders=Sum('purchase', default=0),
+        total_revenue=Sum('sales', default=0)
+    )
+
+    # --- 3. GENERATE STRING KEYS (Format: "1-2025", "11-2025") ---
+    month_keys = []
+    current_date = start_date.replace(day=1)
+
+    while current_date <= end_date:
+        # --- FIX IS HERE ---
+        # Using current_date.month gives 1, 2, ... 11, 12 (No leading zero)
+        key = f"{current_date.month}-{current_date.year}"
+        month_keys.append(key)
+
+        # Increment Month
+
+        if current_date.month == 12:
+            current_date = current_date.replace(year=current_date.year + 1, month=1)
+        else:
+            current_date = current_date.replace(month=current_date.month + 1)
+
+    # --- 4. Chart Data ---
+    # chart_queryset = ReachFrequencyAnalysis.objects.filter(
+    #     monthYear__in=month_keys
+    # ).values('frequency').annotate(
+    #     total_reach=Sum('reach'),
+    #     total_purchases=Sum('purchases'),
+    #     total_impressions=Sum('impressions')
+    # )
+    chart_data = list(ReachFrequencyAnalysis.objects.filter(
+    monthYear__in=month_keys
+    ).values('frequency').annotate(
+        total_reach=Sum('reach'),
+        total_purchases=Sum('purchases'),
+        total_impressions=Sum('impressions')
+    ))
+    chart_data.sort(key=lambda x: int(str(x['frequency']).replace('+', '')))
+
+    chart_labels = []
+    chart_unique_users = []
+    chart_conversion_rate = []
+    chart_conv_rate_imp = []
+
+    total_users_accumulated = 0
+    total_conversion_accumulated = 0
+    count_items = 0
+
+    for entry in chart_data:
+        freq = str(entry['frequency'])
+        reach = float(entry['total_reach'] or 0)
+        impression = float(entry['total_impressions'] or 0)
+        purchases = float(entry['total_purchases'] or 0)
+
+        conversion = 0.0
+
+        if reach > 0:
+            conversion = round((purchases / reach) * 100, 2) 
+        chart_labels.append(freq)
+        chart_unique_users.append(reach)
+        chart_conversion_rate.append(conversion)
+
+        #code by me#######
+        imp_conversion = 0.0
+        if impression > 0:
+            imp_conversion = round((purchases / impression) * 100, 2)  
+        # chart_labels_imp.append(freq)
+        
+        chart_conv_rate_imp.append(imp_conversion) 
+        #code by me#######
+
+
+        total_users_accumulated += reach
+        
+        total_conversion_accumulated += conversion
+        count_items += 1
+
+    # --- 5. Averages ---
+    avg_unique_users = 0
+    avg_conversion_rate = 0.0
+
+    if count_items > 0:
+        avg_unique_users = int(total_users_accumulated / count_items)
+        avg_conversion_rate = round(total_conversion_accumulated / count_items, 2)
+
+
+
+    context = {
+        'current_start': start_date.strftime('%Y-%m-%d'),
+        'current_end': end_date.strftime('%Y-%m-%d'),
+
+        'spends': "{:,.2f}".format(summary['total_spends'] or 0),
+        'orders': "{:,.0f}".format(summary['total_orders'] or 0),
+        'revenue': "{:,.2f}".format(summary['total_revenue'] or 0),
+
+        'chart_labels': json.dumps(chart_labels),
+        'chart_users': json.dumps(chart_unique_users),
+        'chart_conversion': json.dumps(chart_conversion_rate),
+        'chart_conv_rate_imp': json.dumps(chart_conv_rate_imp),
+        'avg_unique_users': "{:,}".format(avg_unique_users),
+        'avg_conversion_rate': "{}%".format(avg_conversion_rate),
+    }
+    return render(request, 'audience.html', context)
 
 from collections import defaultdict
 from datetime import date, timedelta

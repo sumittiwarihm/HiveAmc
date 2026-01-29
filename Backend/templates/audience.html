@@ -1,209 +1,554 @@
 {% extends 'base.html' %}
+
 {% load static %}
+
+
 
 {% block title %}Audience and Reach Frequency - AdPulse{% endblock %}
 
+
+
 {% block extra_css %}
+
     <link rel="stylesheet" href="{% static 'css/audience.css' %}">
+
+    <style>
+
+        /* Add this to your style block */
+        .page-header {
+            display: flex;
+            justify-content: space-between; /* This pushes left and right divs to edges */
+            align-items: center; /* This aligns them vertically */
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        /* --- DATE FILTER FORM STYLES --- */
+
+        .top-date-form {
+            display: flex;
+            align-items: center; /* Changed from 'right' to 'center' */
+            gap: 10px;
+            background: #fff;
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+
+
+        .date-input-group {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 5px;
+
+        }
+
+
+
+        .label-text {
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            color: #555;
+
+        }
+
+
+
+        .top-date-form input[type="date"] {
+
+            border: 1px solid #ccc;
+
+            border-radius: 4px;
+
+            padding: 5px;
+
+            font-size: 13px;
+
+            color: #333;
+
+            outline: none;
+
+            font-family: inherit;
+
+        }
+
+
+
+        .filter-btn {
+
+            background-color: #333;
+
+            color: white;
+
+            border: none;
+
+            padding: 6px 15px;
+
+            border-radius: 4px;
+
+            cursor: pointer;
+
+            font-size: 13px;
+
+            margin-left: 5px;
+
+            transition: background 0.2s;
+
+        }
+
+
+
+        .filter-btn:hover {
+
+            background-color: #000;
+
+        }
+
+    </style>
+
 {% endblock %}
+
+
 
 {% block content %}
 
-    <header class="dashboard-header">
+
+
+    <div class="page-header">
+
         <div class="header-left">
-            <h2>Hello, User</h2>
-            <p class="current-date">{% now "l, F d, Y" %}</p> 
+
+            <h1>Hello, User</h1>
+
+            <p class="sub-text">{% now "l, F d, Y" %}</p>
+
         </div>
-        
-        <div class="date-picker-container">
-             <div class="date-picker-btn">
-                <i class="fa-regular fa-calendar"></i>
-                <span>Dec 9, 2025 - Jan 8, 2026</span>
-            </div>
+
+
+
+        <div class="header-right">
+
+            <form method="GET" action="" class="top-date-form">
+
+                <div class="date-input-group">
+
+                    <span class="label-text">Start:</span>
+
+                    <input type="date" name="start" value="{{ current_start }}" required>
+
+                </div>
+
+               
+
+                <div class="date-input-group">
+
+                    <span class="label-text">End:</span>
+
+                    <input type="date" name="end" value="{{ current_end }}" required>
+
+                </div>
+
+               
+
+                <button type="submit" class="filter-btn">Apply</button>
+
+            </form>
+
         </div>
-    </header>
+
+    </div>
+
+
 
     <section class="summary-section">
-        <div class="summary-card">
+
+        <div class="card summary-card">
+
             <h3 class="red-text">Spends</h3>
-            <div class="value">₹1,26,000</div>
+
+            <div class="value">₹{{ spends }}</div>
+
         </div>
-        <div class="summary-card">
+
+        <div class="card summary-card">
+
             <h3 class="red-text">Orders</h3>
-            <div class="value">4,200</div>
+
+            <div class="value">{{ orders }}</div>
+
         </div>
-        <div class="summary-card">
+
+        <div class="card summary-card">
+
             <h3 class="red-text">Revenue</h3>
-            <div class="value">₹9,60,000</div>
+
+            <div class="value">₹{{ revenue }}</div>
+
         </div>
+
     </section>
+
+
 
     <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;">
 
+
+
     <div class="page-header">
+
         <h2>Audience and Reach Frequency</h2>
+
         <p>Analyze audience reach, unique users, and conversion efficiency</p>
+
     </div>
+
+
 
     <div class="chart-card">
-        
+
+       
+
         <div class="chart-card-header">
+
             <h3>Audience Reach vs Conversion Efficiency</h3>
-            
+
+           
+
             <select class="dsp-dropdown">
+
                 <option value="amazon_dsp" selected>Amazon DSP</option>
+
                 <option value="other_dsp">Other DSP</option>
+
             </select>
+
         </div>
 
-        <div class="audience-chart-container">
+
+
+        <div class="audience-chart-container" style="height: 400px; position: relative;">
+
             <canvas id="reachConversionChart"></canvas>
+
         </div>
+
+
 
         <div class="chart-footer-stats">
+
             <div class="stat-block">
+
                 <div class="stat-label">Avg Unique Users</div>
-                <div class="stat-value">91,450</div>
+
+                <div class="stat-value">{{ avg_unique_users }}</div>
+
             </div>
+
             <div class="stat-block">
+
                 <div class="stat-label">Avg Conversion Rate</div>
-                <div class="stat-value">3.55%</div>
+
+                <div class="stat-value">{{ avg_conversion_rate }}</div>
+
             </div>
+
         </div>
 
+
+
     </div>
+
+
 
 {% endblock %}
 
+
+
 {% block scripts %}
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
+
         document.addEventListener('DOMContentLoaded', () => {
+
             const ctx = document.getElementById('reachConversionChart').getContext('2d');
 
-            // --- Generating Dummy Data to resemble the screenshot ---
-            // Exposures 1 to 30
-            const labels = Array.from({length: 30}, (_, i) => i + 1);
 
-            // Bar Data (Unique Users) - Teal - Random values between 50k and 130k
-            const uniqueUsersData = labels.map(() => Math.floor(Math.random() * (130000 - 50000 + 1) + 50000));
-            
-            // Line Data (Conversion %) - Yellow - Random values between 2% and 5.5%
-            const conversionRateData = labels.map(() => (Math.random() * (5.5 - 2.0) + 2.0).toFixed(2));
+
+            // --- 1. Get Real Data from Django ---
+
+            // 'safe' is required so Django outputs raw JSON instead of escaping it
+
+            const labels = JSON.parse('{{ chart_labels|safe }}');
+
+            const uniqueUsersData = JSON.parse('{{ chart_users|safe }}');
+
+            const conversionRateData = JSON.parse('{{ chart_conversion|safe }}');
+            const chart_conv_rate_imp = JSON.parse('{{ chart_conv_rate_imp|safe }}');
 
 
             new Chart(ctx, {
+
                 data: {
+
                     labels: labels,
+
                     datasets: [
+
                         {
-                            type: 'bar',
-                            label: 'Number of Unique Users',
-                            data: uniqueUsersData,
-                            backgroundColor: '#1abc9c', // Teal color
-                            borderRadius: 4,
-                            barPercentage: 0.7,
-                            categoryPercentage: 0.8,
-                            yAxisID: 'y', // Assign to Left Axis
-                            order: 2 // Ensure bars are behind lines
+
+                            type: 'line',
+
+                            label: 'Reach to Conversion (%)',
+
+                            data: conversionRateData,
+
+                            borderColor: '#f1c40f', // Yellow color
+
+                            backgroundColor: '#f1c40f',
+
+                            borderWidth: 2,
+
+                            pointStyle: 'circle',
+
+                            pointRadius: 5,
+
+                            pointHoverRadius: 7,
+
+                            pointBackgroundColor: '#fff', // White fill for points
+
+                            pointBorderColor: '#f1c40f', // Yellow border for points
+
+                            pointBorderWidth: 2,
+
+                            tension: 0.1, // Slight curve to the line
+
+                            yAxisID: 'y1', // Assign to Right Axis
+
+                            order: 1 // Ensure line is on top
+
                         },
+
                         {
                             type: 'line',
+
                             label: 'Impression to Conversion (%)',
-                            data: conversionRateData,
-                            borderColor: '#f1c40f', // Yellow color
+
+                            data: chart_conv_rate_imp,
+
+                            borderColor: '#000000', // Yellow color
+
                             backgroundColor: '#f1c40f',
+
                             borderWidth: 2,
+
                             pointStyle: 'circle',
+
                             pointRadius: 5,
+
                             pointHoverRadius: 7,
+
                             pointBackgroundColor: '#fff', // White fill for points
-                            pointBorderColor: '#f1c40f', // Yellow border for points
+
+                            pointBorderColor: '#000000', // Yellow border for points
+
                             pointBorderWidth: 2,
-                            tension: 0.3, // Slight curve to the line
+
+                            tension: 0.1, // Slight curve to the line
+
                             yAxisID: 'y1', // Assign to Right Axis
-                            order: 1 // Ensure line is on top
+
+                            order: 2 // Ensure line is on top
+
+                        },
+
+
+                        {
+
+                            type: 'bar',
+
+                            label: 'Number of Unique Users',
+
+                            data: uniqueUsersData,
+
+                            backgroundColor: '#1abc9d', // Teal color
+
+                            borderRadius: 4,
+
+                            barPercentage: 0.6,
+
+                            categoryPercentage: 0.7,
+
+                            yAxisID: 'y', // Assign to Left Axis
+
+                            order: 3 // Ensure bars are behind lines
+
                         }
+
                     ]
+
                 },
+
                 options: {
+
                     responsive: true,
+
                     maintainAspectRatio: false,
+
                     interaction: {
+
                         mode: 'index',
+
                         intersect: false,
+
                     },
+
                     plugins: {
+
                         legend: {
+
                             position: 'top',
+
                             align: 'center',
+
                             labels: {
+
                                 usePointStyle: true,
+
                                 pointStyle: 'circle',
+
                                 padding: 25,
-                                font: { size: 13 },
+
+                                font: { size: 12 },
+
                                 color: '#555'
+
                             }
+
                         },
+
                         tooltip: {
-                            backgroundColor: '#fff',
+
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+
                             titleColor: '#333',
+
                             bodyColor: '#333',
+
                             borderColor: '#eee',
+
                             borderWidth: 1,
-                            padding: 12,
+
+                            padding: 10,
+
                             callbacks: {
+
                                 label: function(context) {
+
                                     let label = context.dataset.label || '';
+
                                     if (label) { label += ': '; }
+
                                     if (context.dataset.yAxisID === 'y1') {
+
                                         // Format line data with %
+
                                         label += context.parsed.y + '%';
+
                                     } else {
+
                                         // Format bar data with commas
+
                                         label += context.parsed.y.toLocaleString();
+
                                     }
+
                                     return label;
+
                                 }
+
                             }
+
                         }
+
                     },
+
                     scales: {
+
                         x: {
+
                             grid: { display: false },
+
                             ticks: { color: '#777' },
-                            title: { display: true, text: 'Exposures', color: '#999', font: {size: 13} }
+
+                            title: { display: true, text: 'Exposures', color: '#999', font: {size: 12} }
+
                         },
+
                         // --- Left Y-Axis (Unique Users) ---
+
                         y: {
+
                             type: 'linear',
+
                             display: true,
+
                             position: 'left',
+
                             beginAtZero: true,
-                            max: 140000, // Match screenshot limit
+
                             grid: { borderDash: [5, 5], color: '#f5f5f5', drawBorder: false },
-                            ticks: {
-                                color: '#777',
-                                stepSize: 35000 // Match screenshot steps
-                            },
-                            title: { display: true, text: 'Unique Users', color: '#999', font: {size: 13} }
+
+                            ticks: { color: '#777' },
+
+                            title: { display: true, text: 'Unique Users', color: '#999' }
+
                         },
+
                         // --- Right Y-Axis (Conversion Rate) ---
+
                         y1: {
+
                             type: 'linear',
+
                             display: true,
+
                             position: 'right',
+
                             beginAtZero: true,
-                            max: 8, // Match screenshot limit
+
                             grid: { display: false }, // Hide right grid lines to avoid clutter
+
                             ticks: {
+
                                 color: '#777',
+
                                 callback: function(value) { return value + '%'; } // Add % sign to ticks
+
                             },
-                            title: { display: true, text: 'Impression to Conversion Rate (%)', color: '#999', font: {size: 13} }
+
+                            title: { display: true, text: 'Impression to Conversion Rate (%)', color: '#999' }
+
                         }
+
                     }
+
                 }
+
             });
+
         });
+
     </script>
+
 {% endblock %}
+
