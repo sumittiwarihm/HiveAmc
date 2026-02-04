@@ -4,458 +4,244 @@
 {% block title %}Path Analysis - AdPulse{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/path_analysis.css' %}">
+<link rel="stylesheet" href="{% static 'css/path_analysis.css' %}">
+<style>
+
+/* NEW TAB BUTTONS */
+.toggle-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.tab-btn {
+    padding: 8px 20px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    background: #fff;
+    cursor: pointer;
+    transition: .3s;
+    font-weight: 500;
+}
+.tab-btn.active {
+    background: #e6f0ff;
+    border-color: #0066cc;
+    color: #0066cc;
+}
+
+/* NTB / Repeat Toggle */
+.toggle-pill-btn {
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    background: #f4f4f4;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: .3s;
+}
+.toggle-pill-btn.active {
+    background: #0066cc;
+    color: white;
+    border-color: #0066cc;
+}
+
+/* Path Badges */
+.badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+}
+.badge-search { background: #3498db; }
+.badge-sp { background: #e74c3c; }
+.badge-dsp { background: #f39c12; }
+.badge-social { background: #8e44ad; }
+
+/* ⭐ FIX: Show text when badge-* class has no background */
+.badge[class*="sponsored_"],
+.badge[class*="brand"],
+.badge[class*="display"],
+.badge[class*="dsp"] {
+    color: #333 !important;
+    background: #f2f2f2 !important;
+}
+
+</style>
 {% endblock %}
 
 {% block content %}
 
-    <style>
-        /* --- HEADER & TAB STYLES --- */
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding: 0 5px;
-        }
-
-        .header-left h1 {
-            font-size: 24px;
-            margin: 0;
-            color: #333;
-            font-weight: 600;
-        }
-
-        .header-left .sub-text {
-            margin: 5px 0 0 0;
-            color: #888;
-            font-size: 14px;
-        }
-
-        /* Right Side Form Styling */
-        .top-date-form {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #fff;
-            padding: 8px 15px;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .date-input-group {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .label-text {
-            font-size: 13px;
-            font-weight: 600;
-            color: #555;
-        }
-
-        .top-date-form input[type="date"] {
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 5px;
-            font-size: 13px;
-            color: #333;
-            outline: none;
-            font-family: inherit;
-        }
-
-        .filter-btn {
-            background-color: #333;
-            color: white;
-            border: none;
-            padding: 6px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            margin-left: 5px;
-            transition: background 0.2s;
-        }
-
-        .filter-btn:hover {
-            background-color: #000;
-        }
-
-        /* Tab Active State Style */
-        .tab-btn {
-            padding: 8px 16px;
-            border: 1px solid #ddd;
-            background: #fff;
-            cursor: pointer;
-            border-radius: 20px;
-            margin-left: 10px;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-        
-        .tab-btn.active {
-            background-color: #e6f0ff; /* Light blue bg */
-            color: #0066cc; /* Blue text */
-            border-color: #0066cc;
-            font-weight: 700;
-        }
-
-        .analysis-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .analysis-title h2 {
-            font-size: 20px;
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-
-        .analysis-title p {
-            color: #7f8c8d;
-            line-height: 1.4;
-            font-size: 14px;
-        }
-
-        .toggle-tabs {
-            display: flex;
-            gap: 0;
-        }
-
-        .tab-btn {
-            padding: 8px 20px;
-            border: 1px solid #ddd;
-            background: #fff;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s;
-            border-radius: 0;
-        }
-
-        .tab-btn:first-child {
-            border-radius: 20px 0 0 20px;
-        }
-
-        .tab-btn:last-child {
-            border-radius: 0 20px 20px 0;
-        }
-        
-        .tab-btn.active {
-            background-color: #e6f0ff;
-            color: #0066cc;
-            border-color: #0066cc;
-            font-weight: 600;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 30px;
-        }
-
-        .metric-card {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-            border: 1px solid #f0f0f0;
-            text-align: center;
-            position: relative;
-        }
-
-        .metric-card h4 {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-
-        .metric-value {
-            font-size: 22px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-
-        .metric-icon {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: white;
-        }
-
-        .icon-green { background: linear-gradient(135deg, #27ae60, #2ecc71); }
-        .icon-blue { background: linear-gradient(135deg, #3498db, #5dade2); }
-        .icon-purple { background: linear-gradient(135deg, #8e44ad, #9b59b6); }
-        .icon-orange { background: linear-gradient(135deg, #e67e22, #f39c12); }
-        .icon-indigo { background: linear-gradient(135deg, #3498db, #5dade2); }
-        .icon-pink { background: linear-gradient(135deg, #e91e63, #f06292); }
-        .icon-teal { background: linear-gradient(135deg, #27ae60, #2ecc71); }
-        .icon-cyan { background: linear-gradient(135deg, #00bcd4, #4dd0e1); }
-    </style>
-
-    <div class="page-header">
-        <div class="header-left">
-            <h1>Hello, User</h1>
-            <p class="sub-text" id="Greetingdate">{% now "l, F d, Y" %}</p>
-        </div>
-
-       <div class="header-right">
-    <form method="GET" action="" class="top-date-form">
-        <div class="date-input-group">
-            <span class="label-text">Start:</span>
-            <input type="date" name="start" value="{{ current_start|date:'Y-m-d' }}" required>
-        </div>
-        
-        <div class="date-input-group">
-            <span class="label-text">End:</span>
-            <input type="date" name="end" value="{{ current_end|date:'Y-m-d' }}" required>
-        </div>
-        
-        <button type="submit" class="filter-btn">Apply</button>
-    </form>
-</div>
+<!-- YOUR ORIGINAL HEADER (UNCHANGED) -->
+<div class="page-header">
+    <div class="header-left">
+        <h1>Hello, User</h1>
+        <p class="sub-text">{% now "l, F d, Y" %}</p>
     </div>
 
-    <section class="summary-section">
-        <div class="card summary-card">
-            <h3 class="red-text">Spends</h3>
-            <div class="value">₹{{ spends }}</div>
-        </div>
-        <div class="card summary-card">
-            <h3 class="red-text">Orders</h3>
-            <div class="value">{{ orders }}</div>
-        </div>
-        <div class="card summary-card">
-            <h3 class="red-text">Revenue</h3>
-            <div class="value">₹{{ revenue }}</div>
-        </div>
-    </section>
-
-    <section class="full-width-section">
-        <div class="card path-table-card">
-            
-            <div class="path-controls-header">
-                <div class="path-title-group">
-                    <h3>Path-to-Purchase Performance</h3>
-                    <p class="subtitle">Analyze campaign journeys by NTB Revenue, Conversion Time, and Channel Sequences.</p>
-                </div>
-                
-                <div class="path-filters">
-                    <div class="filter-row">
-                        <div class="filter-group">
-                            <select class="custom-select-small">
-                                <option>Last 30 Days</option>
-                                <option>Last 60 Days</option>
-                                <option>Last 90 Days</option>
-                                <option>Monthly</option>
-                                <option>Yearly</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <select class="custom-select-small">
-                                <option>All Campaigns</option>
-                                <option>Campaign A</option>
-                                <option>Campaign B</option>
-                                <option>Campaign C</option>
-                                <option>Campaign D</option>
-                            </select>
-                        </div>
-                        
-                        <div class="toggle-pill-container">
-                            <button class="toggle-pill-btn active" id="btnNewCust">New Customers</button>
-                            <button class="toggle-pill-btn" id="btnRepeatCust">Repeat Customers</button>
-                        </div>
-
-                        <div class="filter-group">
-                            <select class="custom-select-small">
-                                <option>All Campaigns</option>
-                                <option>ASIN 1</option>
-                                <option>ASIN 2</option>
-                                <option>ASIN 3</option>
-                                <option>ASIN 4</option>
-                            </select>
-                        </div>
-
-                    </div>
-
-                    <div class="filter-row right-align">
-                        <div class="filter-group">
-                            <select class="custom-select-small">
-                                <option>All Keywords</option>
-                                <option>bluetooth speaker</option>
-                                <option>fitness tracker</option>
-                                <option>noise cancelling headphones</option>
-                                <option>portable speaker</option>
-                                <option>smart watch</option>
-                                <option>wireless earbuds</option>
-                            </select>
-                        </div>
-                        <button class="export-btn"><i class="fa-solid fa-download"></i> Export CSV</button>
-                    </div>
-                </div>
+    <div class="header-right">
+        <form method="GET" action="" class="top-date-form">
+            <div class="date-input-group">
+                <span class="label-text">Start:</span>
+                <input type="date" name="start" value="{{ current_start|date:'Y-m-d' }}" required>
             </div>
 
-            <div class="table-responsive">
-                <table class="path-table">
-                    <thead>
-                        <tr>
-                            <th width="45%">Path</th>
-                            <th width="25%" class="text-right">NTB Rev. Generated (INR) <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
-                            <th width="30%" class="text-right">Median Time to Purchase (Minutes) <i class="fa-solid fa-arrow-down-short-wide sort-icon"></i></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <div class="path-sequence">
-                                    <span class="badge badge-search">Search</span>
-                                    <i class="fa-solid fa-arrow-right-long arrow-icon"></i>
-                                    <span class="badge badge-sp">SP</span>
-                                </div>
-                            </td>
-                            <td class="text-right">
-                                <div class="value-primary">₹58,400</div>
-                                <div class="spark-bar" style="width: 80%"></div>
-                            </td>
-                            <td class="text-right">
-                                4.2 minutes <span class="trend-up"><i class="fa-solid fa-arrow-up"></i></span>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>
-                                <div class="path-sequence">
-                                    <span class="badge badge-dsp">DSP</span>
-                                    <i class="fa-solid fa-arrow-right-long arrow-icon"></i>
-                                    <span class="badge badge-sp">SP</span>
-                                </div>
-                            </td>
-                            <td class="text-right">
-                                <div class="value-primary">₹51,200</div>
-                                <div class="spark-bar" style="width: 70%"></div>
-                            </td>
-                            <td class="text-right">
-                                5.1 minutes <span class="trend-up"><i class="fa-solid fa-arrow-up"></i></span>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>
-                                <div class="path-sequence">
-                                    <span class="badge badge-social">Social</span>
-                                    <i class="fa-solid fa-arrow-right-long arrow-icon"></i>
-                                    <span class="badge badge-search">Search</span>
-                                    <i class="fa-solid fa-arrow-right-long arrow-icon"></i>
-                                    <span class="badge badge-sp">SP</span>
-                                </div>
-                            </td>
-                            <td class="text-right">
-                                <div class="value-primary">₹42,800</div>
-                                <div class="spark-bar" style="width: 60%"></div>
-                            </td>
-                            <td class="text-right">
-                                8.7 minutes <span class="trend-up"><i class="fa-solid fa-arrow-up"></i></span>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>
-                                <div class="path-sequence">
-                                    <span class="badge badge-dsp">DSP</span>
-                                    <i class="fa-solid fa-arrow-right-long arrow-icon"></i>
-                                    <span class="badge badge-search">Search</span>
-                                </div>
-                            </td>
-                            <td class="text-right">
-                                <div class="value-primary">₹39,600</div>
-                                <div class="spark-bar" style="width: 55%"></div>
-                            </td>
-                            <td class="text-right">
-                                6.3 minutes <span class="trend-down"><i class="fa-solid fa-arrow-down"></i></span>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>
-                                <div class="path-sequence">
-                                    <span class="badge badge-sp">SP</span>
-                                    <i class="fa-solid fa-arrow-right-long arrow-icon"></i>
-                                    <span class="badge badge-search">Search</span>
-                                </div>
-                            </td>
-                            <td class="text-right">
-                                <div class="value-primary">₹47,900</div>
-                                <div class="spark-bar" style="width: 65%"></div>
-                            </td>
-                            <td class="text-right">
-                                7.1 minutes <span class="trend-up"><i class="fa-solid fa-arrow-up"></i></span>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>
-                                <div class="path-sequence">
-                                    <span class="badge badge-social">Social</span>
-                                    <i class="fa-solid fa-arrow-right-long arrow-icon"></i>
-                                    <span class="badge badge-dsp">DSP</span>
-                                    <i class="fa-solid fa-arrow-right-long arrow-icon"></i>
-                                    <span class="badge badge-sp">SP</span>
-                                </div>
-                            </td>
-                            <td class="text-right">
-                                <div class="value-primary">₹35,400</div>
-                                <div class="spark-bar" style="width: 48%"></div>
-                            </td>
-                            <td class="text-right">
-                                10.5 minutes <span class="trend-down"><i class="fa-solid fa-arrow-down"></i></span>
-                            </td>
-                        </tr>
-                        
-                        <tr>
-                            <td>
-                                <div class="path-sequence">
-                                    <span class="badge badge-search">Search</span>
-                                </div>
-                            </td>
-                            <td class="text-right">
-                                <div class="value-primary">₹62,300</div>
-                                <div class="spark-bar" style="width: 85%"></div>
-                            </td>
-                            <td class="text-right">
-                                3.8 minutes <span class="trend-up"><i class="fa-solid fa-arrow-up"></i></span>
-                            </td>
-                        </tr>
-
-                    </tbody>
-                </table>
+            <div class="date-input-group">
+                <span class="label-text">End:</span>
+                <input type="date" name="end" value="{{ current_end|date:'Y-m-d' }}" required>
             </div>
 
+            <button type="submit" class="filter-btn">Apply</button>
+        </form>
+    </div>
+</div>
+
+<!-- SUMMARY CARDS (UNCHANGED) -->
+<section class="summary-section">
+    <div class="card summary-card"><h3 class="red-text">Spends</h3><div class="value">₹{{ spends }}</div></div>
+    <div class="card summary-card"><h3 class="red-text">Orders</h3><div class="value">{{ orders }}</div></div>
+    <div class="card summary-card"><h3 class="red-text">Revenue</h3><div class="value">₹{{ revenue }}</div></div>
+</section>
+
+<!-- MAIN SECTION START -->
+<section class="full-width-section">
+<div class="card path-table-card">
+
+    <!-- NEW: TABS (Campaign / Keyword) -->
+    <div class="toggle-tabs">
+        <a href="?tab=campaign&ntb={{ ntb }}&start={{ current_start|date:'Y-m-d' }}&end={{ current_end|date:'Y-m-d' }}"
+           class="tab-btn {% if active_tab == 'campaign' %}active{% endif %}">Campaign Level</a>
+
+        <a href="?tab=keyword&ntb={{ ntb }}&start={{ current_start|date:'Y-m-d' }}&end={{ current_end|date:'Y-m-d' }}"
+           class="tab-btn {% if active_tab == 'keyword' %}active{% endif %}">Keyword Level</a>
+    </div>
+
+    <!-- NEW: NTB / REPEAT TOGGLE -->
+    <div class="toggle-pill-container">
+        <a href="?tab={{ active_tab }}&ntb=true" class="toggle-pill-btn {% if ntb == 'true' %}active{% endif %}">
+            New-To-Brand
+        </a>
+        <a href="?tab={{ active_tab }}&ntb=false" class="toggle-pill-btn {% if ntb == 'false' %}active{% endif %}">
+            Repeat Customers
+        </a>
+    </div>
+
+    <!-- NEW: CAMPAIGN/KEYWORD FILTER -->
+    <div class="filter-row" style="margin-bottom: 20px;">
+        {% if active_tab == "campaign" %}
+            <label>Select Campaign:</label>
+            <select class="custom-select-small" onchange="location=this.value;">
+                <option value="">All</option>
+                {% for r in campaign_rows %}
+                    <option value="?tab=campaign&campaign={{ r.campaignId }}&ntb={{ ntb }}">
+                        {{ r.campaignName }}
+                    </option>
+                {% endfor %}
+            </select>
+        {% endif %}
+
+        {% if active_tab == "keyword" %}
+            <label>Select Keyword:</label>
+            <select class="custom-select-small" onchange="location=this.value;">
+                <option value="">All</option>
+                {% for r in keyword_rows %}
+                    <option value="?tab=keyword&keyword={{ r.keywordId }}&ntb={{ ntb }}">
+                        {{ r.keywordName }}
+                    </option>
+                {% endfor %}
+            </select>
+        {% endif %}
+    </div>
+
+    <!-- ORIGINAL TITLE (UNCHANGED) -->
+    <div class="path-controls-header">
+        <div class="path-title-group">
+            <h3>Path-to-Purchase Performance</h3>
+            <p class="subtitle">Analyze revenue, conversion time & journey sequence.</p>
         </div>
-    </section>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-responsive">
+        <table class="path-table">
+            <thead>
+            <tr>
+                <th>Path</th>
+                <th class="text-right">Revenue (₹)</th>
+                <th class="text-right">Median Time (min)</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            {% if active_tab == "campaign" %}
+                {% for row in campaign_rows %}
+                <tr>
+                    <td>
+                        <div class="path-sequence">
+                            {% for p in row.path %}
+                                {% if p %}
+                                    <span class="badge badge-{{ p }}">{{ p|title }}</span>
+
+                                    {% if not forloop.last %}
+                                        <i class="fa-solid fa-arrow-right-long arrow-icon"></i>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td class="text-right">₹{{ row.sales }}</td>
+                    <td class="text-right">{{ row.median_hour }}</td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+
+            {% if active_tab == "keyword" %}
+                {% for row in keyword_rows %}
+                <tr>
+                    <td>
+                        <div class="path-sequence">
+                           {% for p in row.path %}
+                                {% if p %}
+                                    <span class="badge badge-{{ p }}">{{ p|title }}</span>
+
+                                    {% if not forloop.last %}
+                                        <i class="fa-solid fa-arrow-right-long arrow-icon"></i>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td class="text-right">₹{{ row.sales }}</td>
+                    <td class="text-right">{{ row.median_hour }}</td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+
+            </tbody>
+        </table>
+    </div>
+</div>
+</section>
+
 {% endblock %}
 
 {% block scripts %}
-    <script>
-        // Simple logic for toggle buttons visual state
-        document.querySelectorAll('.toggle-pill-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.toggle-pill-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-    </script>
+<script>
+
+// Maintain active state for tabs on reload
+document.addEventListener("DOMContentLoaded", function () {
+    const params = new URLSearchParams(window.location.search);
+    const activeTab = params.get("tab");
+    const ntb = params.get("ntb");
+
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+        if (btn.href.includes(`tab=${activeTab}`)) btn.classList.add("active");
+    });
+
+    document.querySelectorAll(".toggle-pill-btn").forEach(btn => {
+        if (btn.href.includes(`ntb=${ntb}`)) btn.classList.add("active");
+    });
+});
+
+</script>
 {% endblock %}

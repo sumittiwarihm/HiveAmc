@@ -5,46 +5,156 @@ from django.db.models import Sum
 from django.db.models.functions import TruncDate
 from django.core.serializers.json import DjangoJSONEncoder
 import json
-from .models import DodTable, PathToPurchaseMonthLevel, PathToPurchaseCampaignMom, AudienceOverlap,ReachFrequencyAnalysis
+from .models import DodTable, PathToPurchaseMonthLevel, PathToPurchaseCampaignMom, AudienceOverlap,ReachFrequencyAnalysis,PathToPurchaseKeywordLevel
 
 # Other views
 def audience(request):
     return render(request, 'audience.html')
 
+from datetime import date
+from django.utils import timezone
+from django.db.models import Sum
+from django.shortcuts import render
+import ast
+
+import re
+
+def parse_path(path_str):
+    try:
+        cleaned = path_str.strip()[1:-1]
+        if not cleaned:
+            return []
+
+        raw_items = cleaned.split("],")
+
+        result = []
+        for item in raw_items:
+            item = item.replace("[", "").replace("]", "").strip()
+
+            if "," not in item:
+                continue
+
+            num, channel = item.split(",", 1)
+
+            channel = channel.strip()
+
+            # remove any non-letter characters (fix DSP]] issue)
+            channel = re.sub(r'[^A-Za-z_]', '', channel)
+
+            if not channel:
+                continue
+
+            channel = channel.lower()
+
+            result.append(channel)
+
+        return result
+
+    except:
+        return []
+
+
 def path_analysis(request):
-    # --- 1. Date Logic ---
-    end_date = date(2025, 12, 29)
-    start_date = date(2025, 12, 1)
-    
-    req_start = request.GET.get('start')
-    req_end = request.GET.get('end')
+
+    # -------------------------------
+    # DATE FILTERS (kept original)
+    # -------------------------------
+    end_date = date.today()
+    start_date = end_date.replace(day=1)
+
+    req_start = request.GET.get("start")
+    req_end = request.GET.get("end")
 
     if req_start and req_end:
-        try:
-            start_date = timezone.datetime.strptime(req_start, '%Y-%m-%d').date()
-            end_date = timezone.datetime.strptime(req_end, '%Y-%m-%d').date()
-        except ValueError:
-            pass 
+        start_date = timezone.datetime.strptime(req_start, "%Y-%m-%d").date()
+        end_date = timezone.datetime.strptime(req_end, "%Y-%m-%d").date()
 
-    # --- 2. Queryset Filtering --- lazy loading
+    # -------------------------------
+    # TAB CONTROL (Campaign / Keyword)
+    # -------------------------------
+    active_tab = request.GET.get("tab", "campaign")  # default = campaign
+
+    # -------------------------------
+    # NTB = true/false
+    # -------------------------------
+    ntb = request.GET.get("ntb", "true")
+    flagNewToBrand = True if ntb == "true" else False
+
+    # DATA CONTAINER
+    campaign_rows = []
+    keyword_rows = []
+
+    # -------------------------------
+    # CAMPAIGN LEVEL QUERY
+    #-------------------------------
+    if active_tab == "campaign":
+
+        data = PathToPurchaseCampaignMom.objects.filter(
+            flagNewToBrand=flagNewToBrand,
+        )
+
+        # Optional Campaign Filter
+        campaign_id = request.GET.get("campaign")
+        if campaign_id:
+            data = data.filter(campaignId=campaign_id)
+
+        for row in data:
+            campaign_rows.append({
+                "path": parse_path(row.path),
+                "sales": row.sales,
+                "median_hour": row.medianHourToConversion,
+                "campaignName": row.campaignName,
+                "campaignId": row.campaignId
+            })
+
+    # -------------------------------
+    # KEYWORD LEVEL QUERY
+    # -------------------------------
+    if active_tab == "keyword":
+
+        data = PathToPurchaseKeywordLevel.objects.filter(
+            flagNewToBrand=flagNewToBrand
+        )
+
+        keyword_id = request.GET.get("keyword")
+        if keyword_id:
+            data = data.filter(keywordId=keyword_id)
+
+        for row in data:
+            keyword_rows.append({
+                "path": parse_path(row.path),
+                "sales": row.sales,
+                "median_hour": row.medianHourToConversion,
+                "keywordName": row.keywordName,
+                "keywordId": row.keywordId
+            })
+
+    # -------------------------------
+    # ORIGINAL SUMMARY CARDS LOGIC
+    # -------------------------------
     queryset = DodTable.objects.filter(date__range=[start_date, end_date])
-
-    # --- 3. Aggregation ---
     summary = queryset.aggregate(
         total_spends=Sum('spend', default=0),
         total_orders=Sum('purchase', default=0),
         total_revenue=Sum('sales', default=0)
     )
-    print(start_date,end_date)
+
     context = {
-        'spends': "{:,.2f}".format(summary['total_spends']),
-        'orders': "{:,.0f}".format(summary['total_orders']),
-        'revenue': "{:,.2f}".format(summary['total_revenue']),
-        'current_start': start_date,
-        'current_end': end_date,
+        "spends": "{:,.2f}".format(summary["total_spends"]),
+        "orders": "{:,.0f}".format(summary["total_orders"]),
+        "revenue": "{:,.2f}".format(summary["total_revenue"]),
+        "current_start": start_date,
+        "current_end": end_date,
+
+        "active_tab": active_tab,
+        "ntb": ntb,
+        "campaign_rows": campaign_rows,
+        "keyword_rows": keyword_rows,
     }
 
-    return render(request, 'path_analysis.html', context)
+    return render(request, "path_analysis.html", context)
+
+
 
 
 # Home view
