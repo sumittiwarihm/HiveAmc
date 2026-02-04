@@ -10,8 +10,41 @@ from .models import DodTable, PathToPurchaseMonthLevel, PathToPurchaseCampaignMo
 # Other views
 def audience(request):
     return render(request, 'audience.html')
+
 def path_analysis(request):
-    return render(request, 'path_analysis.html')
+    # --- 1. Date Logic ---
+    end_date = date(2025, 12, 29)
+    start_date = date(2025, 12, 1)
+    
+    req_start = request.GET.get('start')
+    req_end = request.GET.get('end')
+
+    if req_start and req_end:
+        try:
+            start_date = timezone.datetime.strptime(req_start, '%Y-%m-%d').date()
+            end_date = timezone.datetime.strptime(req_end, '%Y-%m-%d').date()
+        except ValueError:
+            pass 
+
+    # --- 2. Queryset Filtering --- lazy loading
+    queryset = DodTable.objects.filter(date__range=[start_date, end_date])
+
+    # --- 3. Aggregation ---
+    summary = queryset.aggregate(
+        total_spends=Sum('spend', default=0),
+        total_orders=Sum('purchase', default=0),
+        total_revenue=Sum('sales', default=0)
+    )
+    print(start_date,end_date)
+    context = {
+        'spends': "{:,.2f}".format(summary['total_spends']),
+        'orders': "{:,.0f}".format(summary['total_orders']),
+        'revenue': "{:,.2f}".format(summary['total_revenue']),
+        'current_start': start_date,
+        'current_end': end_date,
+    }
+
+    return render(request, 'path_analysis.html', context)
 
 
 # Home view

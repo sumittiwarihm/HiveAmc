@@ -94,4 +94,32 @@ class ReachFrequencyAnalysis(models.Model):
 
     def __str__(self):
         return f"{self.account} - {self.monthYear}"
+
+class PathToPurchaseKeywordLevel(models.Model):
+    # 'id' is automatically created by Django as a primary key
+    account = models.CharField(max_length=255)
+    path = models.TextField()  # Changed to TextField to accommodate long path strings
+    monthYear = models.CharField(max_length=255)
+    
+    # Keyword-specific identifiers
+    keywordId = models.BigIntegerField()
+    keywordName = models.CharField(max_length=500)
+    
+    # Metrics - Using DecimalField for precision as per your preference
+    medianDayToConversion = models.DecimalField(max_digits=20, decimal_places=2)
+    medianHourToConversion = models.DecimalField(max_digits=20, decimal_places=2)
+    pathOccurence = models.DecimalField(max_digits=20, decimal_places=2)
+    impression = models.DecimalField(max_digits=20, decimal_places=2)
+    spend = models.DecimalField(max_digits=20, decimal_places=2)
+    userPurchased = models.DecimalField(max_digits=20, decimal_places=2)
+    sales = models.DecimalField(max_digits=20, decimal_places=2)
+    purchase = models.DecimalField(max_digits=20, decimal_places=2)
+    totalSales = models.DecimalField(max_digits=20, decimal_places=2)
+    totalPurchase = models.DecimalField(max_digits=20, decimal_places=2)
+    
+    # Boolean Flag for NTB (New-to-Brand)
+    flagNewToBrand = models.BooleanField(db_index=True)
+
+    def __str__(self):
+        return f"{self.account} - {self.keywordName} ({self.monthYear})"
     
