@@ -223,30 +223,39 @@
     font-size: 12px;
 }
 
+/* --- Path Badges (Modern Pill Style) --- */
 .badge {
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 50px; /* Fully rounded pills */
+    font-size: 11px;
+    font-weight: 600;
     color: white;
+    display: inline-block;
     white-space: nowrap;
+    letter-spacing: 0.3px;
 }
 
-/* Badge Colors based on screenshot */
-.badge-search {
-    background-color: #4285f4; /* Blue */
-}
+/* Amazon specific color matching */
+/* Sponsored Products / SP - Red/Orange */
+.badge-sponsored_products, .badge-sp { background-color: #ff4d4d; }
 
-.badge-sp {
-    background-color: #ff5252; /* Red/Pink */
-}
+/* Sponsored Brands / SB - Blue/Teal */
+.badge-sponsored_brands, .badge-sb { background-color: #00bcd4; }
 
-.badge-dsp {
-    background-color: #ff9800; /* Orange */
-}
+/* Sponsored Display / SD - Blue */
+.badge-sponsored_display, .badge-sd { background-color: #2196f3; }
 
-.badge-social {
-    background-color: #7c4dff; /* Purple */
+/* DSP - Light Orange/Yellow */
+.badge-dsp { background-color: #ffa000; }
+
+/* Default / Other */
+.badge-social { background-color: #673ab7; }
+
+/* The Arrow Styling */
+.arrow-icon {
+    color: #cbd5e0;
+    font-size: 14px;
+    margin: 0 4px;
 }
 
 /* Data Column Styling */

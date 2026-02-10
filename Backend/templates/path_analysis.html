@@ -58,14 +58,29 @@
 .badge-social { background: #8e44ad; }
 
 /* ⭐ FIX: Show text when badge-* class has no background */
-.badge[class*="sponsored_"],
+/* .badge[class*="sponsored_"],
 .badge[class*="brand"],
-.badge[class*="display"],
+.badge[class*="display"], */
 .badge[class*="dsp"] {
-    color: #333 !important;
-    background: #f2f2f2 !important;
+    color: #ffffff !important;
+    background: #046113 !important;
 }
 
+
+.badge[class*="sponsored_"] {
+    color: #ffffff !important;
+    background: #a66700 !important;
+}
+
+.badge[class*="display"] {
+    color: #ffffff !important;
+    background: #a10b0b !important;
+}
+
+.badge[class*="brand"] {
+    color: #ffffff !important;
+    background: #a60b7d !important;
+}
 </style>
 {% endblock %}
 

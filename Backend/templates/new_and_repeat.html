@@ -28,7 +28,6 @@
             font-size: 14px;
         }
 
-        /* Right Side Form Styling */
         .top-date-form {
             display: flex;
             align-items: center;
@@ -74,28 +73,7 @@
             transition: background 0.2s;
         }
 
-        .filter-btn:hover {
-            background-color: #000;
-        }
-
-        /* Tab Active State Style */
-        .tab-btn {
-            padding: 8px 16px;
-            border: 1px solid #ddd;
-            background: #fff;
-            cursor: pointer;
-            border-radius: 20px;
-            margin-left: 10px;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-        
-        .tab-btn.active {
-            background-color: #e6f0ff; /* Light blue bg */
-            color: #0066cc; /* Blue text */
-            border-color: #0066cc;
-            font-weight: 700;
-        }
+        .filter-btn:hover { background-color: #000; }
 
         .analysis-header {
             display: flex;
@@ -116,10 +94,7 @@
             font-size: 14px;
         }
 
-        .toggle-tabs {
-            display: flex;
-            gap: 0;
-        }
+        .toggle-tabs { display: flex; gap: 0; }
 
         .tab-btn {
             padding: 8px 20px;
@@ -132,13 +107,8 @@
             border-radius: 0;
         }
 
-        .tab-btn:first-child {
-            border-radius: 20px 0 0 20px;
-        }
-
-        .tab-btn:last-child {
-            border-radius: 0 20px 20px 0;
-        }
+        .tab-btn:first-child { border-radius: 20px 0 0 20px; }
+        .tab-btn:last-child { border-radius: 0 20px 20px 0; }
         
         .tab-btn.active {
             background-color: #e6f0ff;
@@ -204,12 +174,6 @@
 {% endblock %}
 
 {% block content %}
-<style>
-    /* 1. Global Reset & Fonts (From your original code) */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #fafafa; padding: 40px; color: #333; }
-</style>
-
     <div class="page-header">
         <div class="header-left">
             <h1>Hello, User</h1>
@@ -222,12 +186,10 @@
                     <span class="label-text">Start:</span>
                     <input type="date" name="start" value="{{ current_start }}" required>
                 </div>
-                
                 <div class="date-input-group">
                     <span class="label-text">End:</span>
                     <input type="date" name="end" value="{{ current_end }}" required>
                 </div>
-                
                 <button type="submit" class="filter-btn">Apply</button>
             </form>
         </div>
@@ -251,11 +213,10 @@
     <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 30px;">
 
     <section class="analysis-section">
-        
         <div class="analysis-header">
             <div class="analysis-title">
                 <h2>New and Repeat Customer Analysis</h2>
-                <p>Comprehensive insights into customer behavior, revenue patterns, and campaign performance</p>
+                <p>Comprehensive insights into customer behavior and metrics</p>
             </div>
             
             <div class="toggle-tabs">
@@ -268,7 +229,7 @@
             <div class="metric-card">
                 <h4>Revenue</h4>
                 <div class="metric-value" id="d-revenue">₹{{ new_data.revenue }}</div>
-                <div class="metric-icon icon-green"><i class="fa-solid fa-dollar-sign"></i></div>
+                <div class="metric-icon icon-green"><i class="fa-solid fa-indian-rupee-sign"></i></div>
             </div>
 
             <div class="metric-card">
@@ -313,36 +274,12 @@
                 <div class="metric-icon icon-cyan"><i class="fa-solid fa-users"></i></div>
             </div>
         </div>
-
-        <div class="chart-section">
-            <div class="chart-header">
-                <h3>Revenue and Spend of NTB Campaigns</h3>
-                <p>Campaigns ordered by ascending NTBs generated</p>
-            </div>
-            <div class="chart-container">
-                <canvas id="ntbCampaignChart"></canvas>
-            </div>
-        </div>
-
-        <div class="chart-section">
-            <div class="chart-header">
-                <h3>NTB Revenue & Units by Ad Type</h3>
-                <p>Revenue and units across SP, SB, SD, SBv, DSP</p>
-            </div>
-            <div class="chart-container">
-                <canvas id="adTypeChart"></canvas>
-            </div>
-        </div>
-
     </section>
-
 {% endblock %}
 
 {% block scripts %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script>
-        // Data from Django context
         const dashboardData = {
             new: {
                 revenue: "{{ new_data.revenue }}",
@@ -352,10 +289,7 @@
                 units: "{{ new_data.total_units }}",
                 clicks: "{{ new_data.clicks }}",
                 views: "{{ new_data.purchase_views }}",
-                users: "{{ new_data.users }}",
-                // Chart data for new customers
-                campaignData: {{ new_campaign_data|default:"{'labels': [], 'values': []}"|safe }},
-                adTypeData: {{ new_ad_type_data|default:"{'labels': [], 'values': []}"|safe }}
+                users: "{{ new_data.users }}"
             },
             repeat: {
                 revenue: "{{ repeat_data.revenue }}",
@@ -365,100 +299,13 @@
                 units: "{{ repeat_data.total_units }}",
                 clicks: "{{ repeat_data.clicks }}",
                 views: "{{ repeat_data.purchase_views }}",
-                users: "{{ repeat_data.users }}",
-                // Chart data for repeat customers
-                campaignData: {{ repeat_campaign_data|default:"{'labels': [], 'values': []}"|safe }},
-                adTypeData: {{ repeat_ad_type_data|default:"{'labels': [], 'values': []}"|safe }}
+                users: "{{ repeat_data.users }}"
             }
         };
 
-        // Chart instances
-        let ntbCampaignChart, adTypeChart;
-
-        // Initialize charts when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeCharts();
-            switchTab('new'); // Load default data
-        });
-
-        function initializeCharts() {
-            // NTB Campaigns Chart - Revenue by Date
-            const campaignCtx = document.getElementById('ntbCampaignChart').getContext('2d');
-            ntbCampaignChart = new Chart(campaignCtx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Revenue (Total Sales)',
-                        data: [],
-                        borderColor: 'rgb(75, 192, 192)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        tension: 0.1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Revenue (₹)'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Date'
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Ad Type Chart - Revenue by Ad Product Type
-            const adTypeCtx = document.getElementById('adTypeChart').getContext('2d');
-            adTypeChart = new Chart(adTypeCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Revenue',
-                        data: [],
-                        backgroundColor: [
-                            '#FF6384',
-                            '#36A2EB',
-                            '#FFCE56',
-                            '#4BC0C0',
-                            '#9966FF'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.label + ': ₹' + context.parsed.toLocaleString();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Switch Tab Logic
         function switchTab(type) {
             const data = dashboardData[type];
 
-            // Update Metric Values
             document.getElementById('d-revenue').innerText = '₹' + data.revenue;
             document.getElementById('d-rev-percent').innerText = data.revPercent + '%';
             document.getElementById('d-purchases').innerText = data.purchases;
@@ -468,32 +315,12 @@
             document.getElementById('d-views').innerText = data.views;
             document.getElementById('d-users').innerText = data.users;
 
-            // Update Charts with new data
-            updateCharts(data);
-
-            // Toggle Active Classes on Buttons
             if (type === 'new') {
                 document.getElementById('btn-new').classList.add('active');
                 document.getElementById('btn-repeat').classList.remove('active');
             } else {
                 document.getElementById('btn-new').classList.remove('active');
                 document.getElementById('btn-repeat').classList.add('active');
-            }
-        }
-
-        function updateCharts(data) {
-            // Update NTB Campaigns Chart (Revenue by Date)
-            if (ntbCampaignChart && data.campaignData) {
-                ntbCampaignChart.data.labels = data.campaignData.labels || [];
-                ntbCampaignChart.data.datasets[0].data = data.campaignData.values || [];
-                ntbCampaignChart.update();
-            }
-
-            // Update Ad Type Chart (Revenue by Ad Product Type)
-            if (adTypeChart && data.adTypeData) {
-                adTypeChart.data.labels = data.adTypeData.labels || [];
-                adTypeChart.data.datasets[0].data = data.adTypeData.values || [];
-                adTypeChart.update();
             }
         }
     </script>

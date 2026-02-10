@@ -5,165 +5,59 @@ from django.db.models import Sum
 from django.db.models.functions import TruncDate
 from django.core.serializers.json import DjangoJSONEncoder
 import json
-from .models import DodTable, PathToPurchaseMonthLevel, PathToPurchaseCampaignMom, AudienceOverlap,ReachFrequencyAnalysis,PathToPurchaseKeywordLevel
+from .models import DodTable, PathToPurchaseMonthLevel, PathToPurchaseCampaignMom, AudienceOverlap,ReachFrequencyAnalysis
 
 # Other views
 def audience(request):
     return render(request, 'audience.html')
 
-from datetime import date
-from django.utils import timezone
-from django.db.models import Sum
-from django.shortcuts import render
-import ast
-
-import re
-
-def parse_path(path_str):
-    try:
-        cleaned = path_str.strip()[1:-1]
-        if not cleaned:
-            return []
-
-        raw_items = cleaned.split("],")
-
-        result = []
-        for item in raw_items:
-            item = item.replace("[", "").replace("]", "").strip()
-
-            if "," not in item:
-                continue
-
-            num, channel = item.split(",", 1)
-
-            channel = channel.strip()
-
-            # remove any non-letter characters (fix DSP]] issue)
-            channel = re.sub(r'[^A-Za-z_]', '', channel)
-
-            if not channel:
-                continue
-
-            channel = channel.lower()
-
-            result.append(channel)
-
-        return result
-
-    except:
-        return []
-
-
 def path_analysis(request):
-
-    # -------------------------------
-    # DATE FILTERS (kept original)
-    # -------------------------------
-    end_date = date.today()
-    start_date = end_date.replace(day=1)
-
-    req_start = request.GET.get("start")
-    req_end = request.GET.get("end")
+    # --- 1. Date Logic ---
+    end_date = date(2025, 12, 29)
+    start_date = date(2025, 12, 1)
+    
+    req_start = request.GET.get('start')
+    req_end = request.GET.get('end')
 
     if req_start and req_end:
-        start_date = timezone.datetime.strptime(req_start, "%Y-%m-%d").date()
-        end_date = timezone.datetime.strptime(req_end, "%Y-%m-%d").date()
+        try:
+            start_date = timezone.datetime.strptime(req_start, '%Y-%m-%d').date()
+            end_date = timezone.datetime.strptime(req_end, '%Y-%m-%d').date()
+        except ValueError:
+            pass 
 
-    # -------------------------------
-    # TAB CONTROL (Campaign / Keyword)
-    # -------------------------------
-    active_tab = request.GET.get("tab", "campaign")  # default = campaign
-
-    # -------------------------------
-    # NTB = true/false
-    # -------------------------------
-    ntb = request.GET.get("ntb", "true")
-    flagNewToBrand = True if ntb == "true" else False
-
-    # DATA CONTAINER
-    campaign_rows = []
-    keyword_rows = []
-
-    # -------------------------------
-    # CAMPAIGN LEVEL QUERY
-    #-------------------------------
-    if active_tab == "campaign":
-
-        data = PathToPurchaseCampaignMom.objects.filter(
-            flagNewToBrand=flagNewToBrand,
-        )
-
-        # Optional Campaign Filter
-        campaign_id = request.GET.get("campaign")
-        if campaign_id:
-            data = data.filter(campaignId=campaign_id)
-
-        for row in data:
-            campaign_rows.append({
-                "path": parse_path(row.path),
-                "sales": row.sales,
-                "median_hour": row.medianHourToConversion,
-                "campaignName": row.campaignName,
-                "campaignId": row.campaignId
-            })
-
-    # -------------------------------
-    # KEYWORD LEVEL QUERY
-    # -------------------------------
-    if active_tab == "keyword":
-
-        data = PathToPurchaseKeywordLevel.objects.filter(
-            flagNewToBrand=flagNewToBrand
-        )
-
-        keyword_id = request.GET.get("keyword")
-        if keyword_id:
-            data = data.filter(keywordId=keyword_id)
-
-        for row in data:
-            keyword_rows.append({
-                "path": parse_path(row.path),
-                "sales": row.sales,
-                "median_hour": row.medianHourToConversion,
-                "keywordName": row.keywordName,
-                "keywordId": row.keywordId
-            })
-
-    # -------------------------------
-    # ORIGINAL SUMMARY CARDS LOGIC
-    # -------------------------------
+    # --- 2. Queryset Filtering --- lazy loading
     queryset = DodTable.objects.filter(date__range=[start_date, end_date])
+
+    # --- 3. Aggregation ---
     summary = queryset.aggregate(
         total_spends=Sum('spend', default=0),
         total_orders=Sum('purchase', default=0),
         total_revenue=Sum('sales', default=0)
     )
-
+    print(summary)
     context = {
-        "spends": "{:,.2f}".format(summary["total_spends"]),
-        "orders": "{:,.0f}".format(summary["total_orders"]),
-        "revenue": "{:,.2f}".format(summary["total_revenue"]),
-        "current_start": start_date,
-        "current_end": end_date,
-
-        "active_tab": active_tab,
-        "ntb": ntb,
-        "campaign_rows": campaign_rows,
-        "keyword_rows": keyword_rows,
+        'spends': "{:,.2f}".format(summary['total_spends']),
+        'orders': "{:,.0f}".format(summary['total_orders']),
+        'revenue': "{:,.2f}".format(summary['total_revenue']),
+        'current_start': start_date,
+        'current_end': end_date,
     }
 
-    return render(request, "path_analysis.html", context)
-
-
+    return render(request, 'path_analysis.html', context)
 
 
 # Home view
 
 
 
+from django.shortcuts import render
+from django.db.models import Sum
+from django.utils import timezone
+from datetime import date
+
 def new_and_repeat(request):
     # --- 1. Date Logic ---
-    # Default to a specific range or current month logic
     end_date = date(2025, 12, 29)
     start_date = date(2025, 12, 1)
     
@@ -178,15 +72,14 @@ def new_and_repeat(request):
             pass
     
     # --- 2. Base QuerySet ---
-    # Get all records within the date range
     queryset = DodTable.objects.filter(date__range=[start_date, end_date])
     summary = queryset.aggregate(
         total_spends=Sum('spend', default=0),
         total_orders=Sum('purchase', default=0),
         total_revenue=Sum('sales', default=0)
     )
+
     # --- 3. Global Aggregations (For Denominators) ---
-    # We need total sales/purchases across BOTH New and Repeat to calculate percentages (e.g., 75%)
     global_stats = queryset.aggregate(
         global_sales=Sum('sales', default=0),
         global_purchases=Sum('purchase', default=0)
@@ -197,11 +90,8 @@ def new_and_repeat(request):
 
     # --- 4. Helper Function to Get Segment Data ---
     def get_segment_data(is_new_to_brand):
-        # Filter by the flag
         segment_qs = queryset.filter(flagNewToBrand=is_new_to_brand)
         
-        # Aggregate the required metrics
-        # Note: Mapping 'Total Units Sold' to 'totalPurchase' and 'Purchase Views' to 'impression' per instructions
         summary = segment_qs.aggregate(
             revenue=Sum('sales', default=0),
             purchases=Sum('purchase', default=0),
@@ -211,11 +101,9 @@ def new_and_repeat(request):
             users_metric=Sum('impression', default=0) 
         )
 
-        # Extract values
         rev = summary['revenue'] or 0
         purch = summary['purchases'] or 0
         
-        # Calculate Percentages (Avoid Division by Zero)
         rev_percent = (rev / global_sales * 100) if global_sales > 0 else 0
         purch_percent = (purch / global_purchases * 100) if global_purchases > 0 else 0
 
@@ -230,49 +118,9 @@ def new_and_repeat(request):
             'users': "{:,.0f}".format(summary['users_metric'] or 0),
         }
 
-    # --- 5. Build Context for View ---
     # Generate dictionaries for both tabs
     new_cust_data = get_segment_data(is_new_to_brand=True)
     repeat_cust_data = get_segment_data(is_new_to_brand=False)
-
-    # --- 5. Chart Data Preparation ---
-    
-    # Revenue by Date for Campaign Chart
-    def get_revenue_by_date(is_new_to_brand):
-        segment_qs = queryset.filter(flagNewToBrand=is_new_to_brand)
-        revenue_by_date = segment_qs.values('date').annotate(
-            daily_revenue=Sum('totalSales')
-        ).order_by('date')
-        
-        labels = [item['date'].strftime('%Y-%m-%d') for item in revenue_by_date]
-        values = [float(item['daily_revenue']) for item in revenue_by_date]
-        
-        return {
-            'labels': labels,
-            'values': values
-        }
-    
-    # Revenue by Ad Product Type
-    def get_revenue_by_ad_type(is_new_to_brand):
-        segment_qs = queryset.filter(flagNewToBrand=is_new_to_brand)
-        revenue_by_type = segment_qs.values('adProductType').annotate(
-            type_revenue=Sum('totalSales')
-        ).order_by('-type_revenue')
-        
-        labels = [item['adProductType'] for item in revenue_by_type]
-        values = [float(item['type_revenue']) for item in revenue_by_type]
-        
-        return {
-            'labels': labels,
-            'values': values
-        }
-    
-    # Generate chart data for both segments
-    new_campaign_data = get_revenue_by_date(True)
-    new_ad_type_data = get_revenue_by_ad_type(True)
-    
-    repeat_campaign_data = get_revenue_by_date(False)
-    repeat_ad_type_data = get_revenue_by_ad_type(False)
 
     context = {
         'current_start': start_date.strftime('%Y-%m-%d'),
@@ -280,17 +128,9 @@ def new_and_repeat(request):
         'spends': "{:,.2f}".format(summary['total_spends']),
         'orders': "{:,.0f}".format(summary['total_orders']),
         'revenue': "{:,.2f}".format(summary['total_revenue']),
-        # Pass both dictionaries to the template
-        # You can access them in template like {{ new_data.revenue }} or {{ repeat_data.clicks }}
         'new_data': new_cust_data,
         'repeat_data': repeat_cust_data,
-        # Chart data for both segments
-        'new_campaign_data': new_campaign_data,
-        'new_ad_type_data': new_ad_type_data,
-        'repeat_campaign_data': repeat_campaign_data,
-        'repeat_ad_type_data': repeat_ad_type_data,
     }
-
     return render(request, 'new_and_repeat.html', context)
 
 def home(request):
