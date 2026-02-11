@@ -55,12 +55,36 @@ from django.shortcuts import render
 from django.db.models import Sum
 from django.utils import timezone
 from datetime import date
+from django.db.models.functions import TruncMonth
+
+
+from django.shortcuts import render
+from django.db.models import Sum
+from django.utils import timezone
+from datetime import date
+from .models import DodTable, PathToPurchaseCampaignMom
+
+
+from django.shortcuts import render
+from django.db.models import Sum
+from django.utils import timezone
+from datetime import date
+from .models import DodTable, PathToPurchaseCampaignMom
+
+
+from django.shortcuts import render
+from django.db.models import Sum
+from django.utils import timezone
+from datetime import date
+from .models import DodTable, PathToPurchaseCampaignMom
+
 
 def new_and_repeat(request):
+
     # --- 1. Date Logic ---
     end_date = date(2025, 12, 29)
     start_date = date(2025, 12, 1)
-    
+
     req_start = request.GET.get('start')
     req_end = request.GET.get('end')
 
@@ -70,40 +94,40 @@ def new_and_repeat(request):
             end_date = timezone.datetime.strptime(req_end, '%Y-%m-%d').date()
         except ValueError:
             pass
-    
+
     # --- 2. Base QuerySet ---
     queryset = DodTable.objects.filter(date__range=[start_date, end_date])
+
     summary = queryset.aggregate(
         total_spends=Sum('spend', default=0),
         total_orders=Sum('purchase', default=0),
         total_revenue=Sum('sales', default=0)
     )
 
-    # --- 3. Global Aggregations (For Denominators) ---
+    # --- 3. Global Aggregations ---
     global_stats = queryset.aggregate(
         global_sales=Sum('sales', default=0),
         global_purchases=Sum('purchase', default=0)
     )
-    
     global_sales = global_stats['global_sales'] or 0
     global_purchases = global_stats['global_purchases'] or 0
 
-    # --- 4. Helper Function to Get Segment Data ---
+    # --- 4. Helper Function for New/Repeat ---
     def get_segment_data(is_new_to_brand):
         segment_qs = queryset.filter(flagNewToBrand=is_new_to_brand)
-        
+
         summary = segment_qs.aggregate(
             revenue=Sum('sales', default=0),
             purchases=Sum('purchase', default=0),
-            total_units=Sum('totalPurchase', default=0), 
+            total_units=Sum('totalPurchase', default=0),
             clicks=Sum('clicks', default=0),
-            purchase_views=Sum('impression', default=0), 
-            users_metric=Sum('impression', default=0) 
+            purchase_views=Sum('impression', default=0),
+            users_metric=Sum('impression', default=0)
         )
 
         rev = summary['revenue'] or 0
         purch = summary['purchases'] or 0
-        
+
         rev_percent = (rev / global_sales * 100) if global_sales > 0 else 0
         purch_percent = (purch / global_purchases * 100) if global_purchases > 0 else 0
 
@@ -118,20 +142,117 @@ def new_and_repeat(request):
             'users': "{:,.0f}".format(summary['users_metric'] or 0),
         }
 
-    # Generate dictionaries for both tabs
-    new_cust_data = get_segment_data(is_new_to_brand=True)
-    repeat_cust_data = get_segment_data(is_new_to_brand=False)
+    new_cust_data = get_segment_data(True)
+    repeat_cust_data = get_segment_data(False)
+
+    # ====================================================
+    # --- 5. Existing Month Filter for CAMPAIGN Chart ---
+    # ====================================================
+    selected_month = request.GET.get("chart_month")
+
+    all_months = (
+        PathToPurchaseCampaignMom.objects.values_list("monthYear", flat=True)
+        .distinct()
+        .order_by("-monthYear")
+    )
+
+    if selected_month:
+        chart_base_qs = PathToPurchaseCampaignMom.objects.filter(monthYear=selected_month)
+    else:
+        chart_base_qs = PathToPurchaseCampaignMom.objects.all()
+
+    # New customer data
+    chart_new_qs = chart_base_qs.filter(flagNewToBrand=True)
+
+    chart_new_campaigns = list(chart_new_qs.values_list("campaignId", flat=True))
+    chart_new_sales = [float(x) for x in chart_new_qs.values_list("sales", flat=True)]
+    chart_new_spend = [float(x) for x in chart_new_qs.values_list("spend", flat=True)]
+
+    # Repeat customer data
+    chart_repeat_qs = chart_base_qs.filter(flagNewToBrand=False)
+
+    chart_repeat_campaigns = list(chart_repeat_qs.values_list("campaignId", flat=True))
+    chart_repeat_sales = [float(x) for x in chart_repeat_qs.values_list("sales", flat=True)]
+    chart_repeat_spend = [float(x) for x in chart_repeat_qs.values_list("spend", flat=True)]
+
+    # ====================================================
+    # --- 6. NEW: Month Filter for DodTable Chart (YYYY-MM) ---
+    # ====================================================
+
+    selected_dod_month = request.GET.get("dod_month")
+
+    all_dod_months = (
+    DodTable.objects
+        .annotate(month_str=TruncMonth("date"))
+        .values_list("month_str", flat=True)
+        .distinct()
+        .order_by("-month_str")
+)
+
+
+    # Format months as YYYY-MM
+    all_dod_months = [m.strftime("%Y-%m") for m in all_dod_months]
+
+    if selected_dod_month:
+        year, month = map(int, selected_dod_month.split("-"))
+        dod_base_qs = DodTable.objects.filter(
+            date__year=year, date__month=month
+        )
+    else:
+        dod_base_qs = DodTable.objects.all()
+
+    # NEW customer DodTable chart
+    dod_new_qs = dod_base_qs.filter(flagNewToBrand=True)
+    dod_new_labels = list(dod_new_qs.values_list("adProductType", flat=True))
+    dod_new_sales = [float(x) for x in dod_new_qs.values_list("sales", flat=True)]
+    dod_new_purchase = [float(x) for x in dod_new_qs.values_list("purchase", flat=True)]
+
+    # REPEAT customer DodTable chart
+    dod_repeat_qs = dod_base_qs.filter(flagNewToBrand=False)
+    dod_repeat_labels = list(dod_repeat_qs.values_list("adProductType", flat=True))
+    dod_repeat_sales = [float(x) for x in dod_repeat_qs.values_list("sales", flat=True)]
+    dod_repeat_purchase = [float(x) for x in dod_repeat_qs.values_list("purchase", flat=True)]
+
+    # ====================================================
+    # --- 7. Final Context ---
+    # ====================================================
 
     context = {
         'current_start': start_date.strftime('%Y-%m-%d'),
         'current_end': end_date.strftime('%Y-%m-%d'),
+
         'spends': "{:,.2f}".format(summary['total_spends']),
         'orders': "{:,.0f}".format(summary['total_orders']),
         'revenue': "{:,.2f}".format(summary['total_revenue']),
+
         'new_data': new_cust_data,
         'repeat_data': repeat_cust_data,
+
+        # CAMPAIGN chart
+        'chart_months': list(all_months),
+        'selected_month': selected_month,
+        'chart_new_campaigns': chart_new_campaigns,
+        'chart_new_sales': chart_new_sales,
+        'chart_new_spend': chart_new_spend,
+        'chart_repeat_campaigns': chart_repeat_campaigns,
+        'chart_repeat_sales': chart_repeat_sales,
+        'chart_repeat_spend': chart_repeat_spend,
+
+        # DODTABLE chart
+        'dod_months': all_dod_months,
+        'selected_dod_month': selected_dod_month,
+        'dod_new_labels': dod_new_labels,
+        'dod_new_sales': dod_new_sales,
+        'dod_new_purchase': dod_new_purchase,
+        'dod_repeat_labels': dod_repeat_labels,
+        'dod_repeat_sales': dod_repeat_sales,
+        'dod_repeat_purchase': dod_repeat_purchase,
     }
+
     return render(request, 'new_and_repeat.html', context)
+
+
+
 
 def home(request):
     # --- 1. Date Logic ---

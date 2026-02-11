@@ -4,324 +4,399 @@
 {% block title %}New & Repeat Analysis - AdPulse{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/new_and_repeat.css' %}">
-    <style>
-        /* --- HEADER & TAB STYLES --- */
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding: 0 5px;
-        }
+<link rel="stylesheet" href="{% static 'css/new_and_repeat.css' %}">
+<style>
+/* HEADER STYLING */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 0 5px;
+}
 
-        .header-left h1 {
-            font-size: 24px;
-            margin: 0;
-            color: #333;
-            font-weight: 600;
-        }
+.header-left h1 {
+    font-size: 24px;
+    margin: 0;
+    color: #333;
+    font-weight: 600;
+}
 
-        .header-left .sub-text {
-            margin: 5px 0 0 0;
-            color: #888;
-            font-size: 14px;
-        }
+.header-left .sub-text {
+    margin: 5px 0 0 0;
+    color: #888;
+    font-size: 14px;
+}
 
-        .top-date-form {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #fff;
-            padding: 8px 15px;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
+.top-date-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    padding: 8px 15px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
 
-        .date-input-group {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+.date-input-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
 
-        .label-text {
-            font-size: 13px;
-            font-weight: 600;
-            color: #555;
-        }
+.label-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+}
 
-        .top-date-form input[type="date"] {
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 5px;
-            font-size: 13px;
-            color: #333;
-            outline: none;
-            font-family: inherit;
-        }
+.top-date-form input[type="date"] {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px;
+    font-size: 13px;
+    color: #333;
+}
 
-        .filter-btn {
-            background-color: #333;
-            color: white;
-            border: none;
-            padding: 6px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            margin-left: 5px;
-            transition: background 0.2s;
-        }
+.filter-btn {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 6px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+.filter-btn:hover { background-color: #000; }
 
-        .filter-btn:hover { background-color: #000; }
-
-        .analysis-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .analysis-title h2 {
-            font-size: 20px;
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-
-        .analysis-title p {
-            color: #7f8c8d;
-            line-height: 1.4;
-            font-size: 14px;
-        }
-
-        .toggle-tabs { display: flex; gap: 0; }
-
-        .tab-btn {
-            padding: 8px 20px;
-            border: 1px solid #ddd;
-            background: #fff;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s;
-            border-radius: 0;
-        }
-
-        .tab-btn:first-child { border-radius: 20px 0 0 20px; }
-        .tab-btn:last-child { border-radius: 0 20px 20px 0; }
-        
-        .tab-btn.active {
-            background-color: #e6f0ff;
-            color: #0066cc;
-            border-color: #0066cc;
-            font-weight: 600;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 30px;
-        }
-
-        .metric-card {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-            border: 1px solid #f0f0f0;
-            text-align: center;
-            position: relative;
-        }
-
-        .metric-card h4 {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-
-        .metric-value {
-            font-size: 22px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-
-        .metric-icon {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: white;
-        }
-
-        .icon-green { background: linear-gradient(135deg, #27ae60, #2ecc71); }
-        .icon-blue { background: linear-gradient(135deg, #3498db, #5dade2); }
-        .icon-purple { background: linear-gradient(135deg, #8e44ad, #9b59b6); }
-        .icon-orange { background: linear-gradient(135deg, #e67e22, #f39c12); }
-        .icon-indigo { background: linear-gradient(135deg, #3498db, #5dade2); }
-        .icon-pink { background: linear-gradient(135deg, #e91e63, #f06292); }
-        .icon-teal { background: linear-gradient(135deg, #27ae60, #2ecc71); }
-        .icon-cyan { background: linear-gradient(135deg, #00bcd4, #4dd0e1); }
-    </style>
+</style>
 {% endblock %}
 
 {% block content %}
-    <div class="page-header">
-        <div class="header-left">
-            <h1>Hello, User</h1>
-            <p class="sub-text">{% now "l, F d, Y" %}</p>
-        </div>
 
-        <div class="header-right">
-            <form method="GET" action="" class="top-date-form">
-                <div class="date-input-group">
-                    <span class="label-text">Start:</span>
-                    <input type="date" name="start" value="{{ current_start }}" required>
-                </div>
-                <div class="date-input-group">
-                    <span class="label-text">End:</span>
-                    <input type="date" name="end" value="{{ current_end }}" required>
-                </div>
-                <button type="submit" class="filter-btn">Apply</button>
-            </form>
+<!-- ========================= -->
+<!--        HEADER             -->
+<!-- ========================= -->
+<div class="page-header">
+    <div class="header-left">
+        <h1>Hello, User</h1>
+        <p class="sub-text">{% now "l, F d, Y" %}</p>
+    </div>
+
+    <div class="header-right">
+        <form method="GET" action="" class="top-date-form">
+            <div class="date-input-group">
+                <span class="label-text">Start:</span>
+                <input type="date" name="start" value="{{ current_start }}" required>
+            </div>
+            <div class="date-input-group">
+                <span class="label-text">End:</span>
+                <input type="date" name="end" value="{{ current_end }}" required>
+            </div>
+            <button type="submit" class="filter-btn">Apply</button>
+        </form>
+    </div>
+</div>
+
+
+<!-- ========================= -->
+<!--      SUMMARY CARDS        -->
+<!-- ========================= -->
+<section class="summary-section">
+    <div class="card summary-card">
+        <h3 class="red-text">Spends</h3>
+        <div class="value">₹{{ spends }}</div>
+    </div>
+    <div class="card summary-card">
+        <h3 class="red-text">Orders</h3>
+        <div class="value">{{ orders }}</div>
+    </div>
+    <div class="card summary-card">
+        <h3 class="red-text">Revenue</h3>
+        <div class="value">₹{{ revenue }}</div>
+    </div>
+</section>
+
+<hr>
+
+
+<!-- ========================= -->
+<!--      NEW / REPEAT TABS    -->
+<!-- ========================= -->
+<section class="analysis-section">
+    <div class="analysis-header">
+        <div class="analysis-title">
+            <h2>New and Repeat Customer Analysis</h2>
+            <p>Comprehensive insights into customer behavior and metrics</p>
+        </div>
+        
+        <div class="toggle-tabs">
+            <button id="btn-new" class="tab-btn active" onclick="switchTab('new')">New Customers</button>
+            <button id="btn-repeat" class="tab-btn" onclick="switchTab('repeat')">Repeat Customers</button>
         </div>
     </div>
 
-    <section class="summary-section">
-        <div class="card summary-card">
-            <h3 class="red-text">Spends</h3>
-            <div class="value">₹{{ spends }}</div>
-        </div>
-        <div class="card summary-card">
-            <h3 class="red-text">Orders</h3>
-            <div class="value">{{ orders }}</div>
-        </div>
-        <div class="card summary-card">
-            <h3 class="red-text">Revenue</h3>
-            <div class="value">₹{{ revenue }}</div>
-        </div>
-    </section>
-
-    <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 30px;">
-
-    <section class="analysis-section">
-        <div class="analysis-header">
-            <div class="analysis-title">
-                <h2>New and Repeat Customer Analysis</h2>
-                <p>Comprehensive insights into customer behavior and metrics</p>
-            </div>
-            
-            <div class="toggle-tabs">
-                <button id="btn-new" class="tab-btn active" onclick="switchTab('new')">New Customers</button>
-                <button id="btn-repeat" class="tab-btn" onclick="switchTab('repeat')">Repeat Customers</button>
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <h4>Revenue</h4>
+            <div class="metric-value" id="d-revenue">₹{{ new_data.revenue }}</div>
+            <div class="metric-icon icon-green">
+                <i class="fa-solid fa-indian-rupee-sign"></i>
             </div>
         </div>
 
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <h4>Revenue</h4>
-                <div class="metric-value" id="d-revenue">₹{{ new_data.revenue }}</div>
-                <div class="metric-icon icon-green"><i class="fa-solid fa-indian-rupee-sign"></i></div>
-            </div>
-
-            <div class="metric-card">
-                <h4>% Revenue</h4>
-                <div class="metric-value" id="d-rev-percent">{{ new_data.revenue_percent }}%</div>
-                <div class="metric-icon icon-blue"><i class="fa-solid fa-percent"></i></div>
-            </div>
-
-            <div class="metric-card">
-                <h4>Purchases</h4>
-                <div class="metric-value" id="d-purchases">{{ new_data.purchases }}</div>
-                <div class="metric-icon icon-purple"><i class="fa-solid fa-cart-shopping"></i></div>
-            </div>
-
-            <div class="metric-card">
-                <h4>% Purchases</h4>
-                <div class="metric-value" id="d-purch-percent">{{ new_data.purchases_percent }}%</div>
-                <div class="metric-icon icon-orange"><i class="fa-solid fa-percent"></i></div>
-            </div>
-
-            <div class="metric-card">
-                <h4>Total Units Sold</h4>
-                <div class="metric-value" id="d-units">{{ new_data.total_units }}</div>
-                <div class="metric-icon icon-indigo"><i class="fa-solid fa-box-open"></i></div>
-            </div>
-
-            <div class="metric-card">
-                <h4>Clicks</h4>
-                <div class="metric-value" id="d-clicks">{{ new_data.clicks }}</div>
-                <div class="metric-icon icon-pink"><i class="fa-solid fa-arrow-pointer"></i></div>
-            </div>
-
-            <div class="metric-card">
-                <h4>Purchase Views</h4>
-                <div class="metric-value" id="d-views">{{ new_data.purchase_views }}</div>
-                <div class="metric-icon icon-teal"><i class="fa-solid fa-eye"></i></div>
-            </div>
-
-            <div class="metric-card">
-                <h4>Users</h4>
-                <div class="metric-value" id="d-users">{{ new_data.users }}</div>
-                <div class="metric-icon icon-cyan"><i class="fa-solid fa-users"></i></div>
+        <div class="metric-card">
+            <h4>% Revenue</h4>
+            <div class="metric-value" id="d-rev-percent">{{ new_data.revenue_percent }}%</div>
+            <div class="metric-icon icon-blue">
+                <i class="fa-solid fa-percent"></i>
             </div>
         </div>
-    </section>
+
+        <div class="metric-card">
+            <h4>Purchases</h4>
+            <div class="metric-value" id="d-purchases">{{ new_data.purchases }}</div>
+            <div class="metric-icon icon-purple">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <h4>% Purchases</h4>
+            <div class="metric-value" id="d-purch-percent">{{ new_data.purchases_percent }}%</div>
+            <div class="metric-icon icon-orange">
+                <i class="fa-solid fa-percent"></i>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <h4>Total Units Sold</h4>
+            <div class="metric-value" id="d-units">{{ new_data.total_units }}</div>
+            <div class="metric-icon icon-indigo">
+                <i class="fa-solid fa-box-open"></i>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <h4>Clicks</h4>
+            <div class="metric-value" id="d-clicks">{{ new_data.clicks }}</div>
+            <div class="metric-icon icon-pink">
+                <i class="fa-solid fa-arrow-pointer"></i>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <h4>Purchase Views</h4>
+            <div class="metric-value" id="d-views">{{ new_data.purchase_views }}</div>
+            <div class="metric-icon icon-teal">
+                <i class="fa-solid fa-eye"></i>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <h4>Users</h4>
+            <div class="metric-value" id="d-users">{{ new_data.users }}</div>
+            <div class="metric-icon icon-cyan">
+                <i class="fa-solid fa-users"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ========================= -->
+<!--   CAMPAIGN CHART FILTER   -->
+<!-- ========================= -->
+<form method="GET" action="" style="margin-bottom:20px;">
+    <label style="font-weight:600;">Campaign Chart Month:</label>
+
+    <select name="chart_month" onchange="this.form.submit()"
+            style="padding:5px; border:1px solid #ccc; border-radius:4px;">
+        <option value="">All Months</option>
+        {% for m in chart_months %}
+            <option value="{{ m }}" {% if m == selected_month %}selected{% endif %}>
+                {{ m }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <input type="hidden" name="start" value="{{ current_start }}">
+    <input type="hidden" name="end" value="{{ current_end }}">
+    <input type="hidden" name="dod_month" value="{{ selected_dod_month }}">
+</form>
+
+
+<!-- ========================= -->
+<!--    CAMPAIGN CHART        -->
+<!-- ========================= -->
+<div style="width:100%; height:400px;">
+    <div id="campaignChart" style="width: 100%; height: 400px;"></div>
+</div>
+
+
+<!-- ========================= -->
+<!--     DODTABLE MONTH       -->
+<!-- ========================= -->
+<form method="GET" action="" style="margin-top:40px; margin-bottom:20px;">
+    <label style="font-weight:600;">Ad Product Chart Month:</label>
+
+    <select name="dod_month" onchange="this.form.submit()"
+            style="padding:5px; border:1px solid #ccc; border-radius:4px;">
+        <option value="">All Months</option>
+        {% for m in dod_months %}
+            <option value="{{ m }}" {% if m == selected_dod_month %}selected{% endif %}>
+                {{ m }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <input type="hidden" name="start" value="{{ current_start }}">
+    <input type="hidden" name="end" value="{{ current_end }}">
+    <input type="hidden" name="chart_month" value="{{ selected_month }}">
+</form>
+
+
+<!-- ========================= -->
+<!--     SECOND CHART (DodTable) -->
+<!-- ========================= -->
+<div style="width:100%; height:400px;">
+    <div id="dodChart" style="width:100%; height:400px;"></div>
+</div>
+
+
 {% endblock %}
 
 {% block scripts %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        const dashboardData = {
-            new: {
-                revenue: "{{ new_data.revenue }}",
-                revPercent: "{{ new_data.revenue_percent }}",
-                purchases: "{{ new_data.purchases }}",
-                purchPercent: "{{ new_data.purchases_percent }}",
-                units: "{{ new_data.total_units }}",
-                clicks: "{{ new_data.clicks }}",
-                views: "{{ new_data.purchase_views }}",
-                users: "{{ new_data.users }}"
-            },
-            repeat: {
-                revenue: "{{ repeat_data.revenue }}",
-                revPercent: "{{ repeat_data.revenue_percent }}",
-                purchases: "{{ repeat_data.purchases }}",
-                purchPercent: "{{ repeat_data.purchases_percent }}",
-                units: "{{ repeat_data.total_units }}",
-                clicks: "{{ repeat_data.clicks }}",
-                views: "{{ repeat_data.purchase_views }}",
-                users: "{{ repeat_data.users }}"
-            }
-        };
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 
-        function switchTab(type) {
-            const data = dashboardData[type];
+<script>
+/* ===================================================== */
+/*          1) METRIC TAB SWITCHING                      */
+/* ===================================================== */
+const dashboardData = {
+    new: {
+        revenue: "{{ new_data.revenue }}",
+        revPercent: "{{ new_data.revenue_percent }}",
+        purchases: "{{ new_data.purchases }}",
+        purchPercent: "{{ new_data.purchases_percent }}",
+        units: "{{ new_data.total_units }}",
+        clicks: "{{ new_data.clicks }}",
+        views: "{{ new_data.purchase_views }}",
+        users: "{{ new_data.users }}"
+    },
+    repeat: {
+        revenue: "{{ repeat_data.revenue }}",
+        revPercent: "{{ repeat_data.revenue_percent }}",
+        purchases: "{{ repeat_data.purchases }}",
+        purchPercent: "{{ repeat_data.purchases_percent }}",
+        units: "{{ repeat_data.total_units }}",
+        clicks: "{{ repeat_data.clicks }}",
+        views: "{{ repeat_data.purchase_views }}",
+        users: "{{ repeat_data.users }}"
+    }
+};
 
-            document.getElementById('d-revenue').innerText = '₹' + data.revenue;
-            document.getElementById('d-rev-percent').innerText = data.revPercent + '%';
-            document.getElementById('d-purchases').innerText = data.purchases;
-            document.getElementById('d-purch-percent').innerText = data.purchPercent + '%';
-            document.getElementById('d-units').innerText = data.units;
-            document.getElementById('d-clicks').innerText = data.clicks;
-            document.getElementById('d-views').innerText = data.views;
-            document.getElementById('d-users').innerText = data.users;
+function switchTab(type) {
 
-            if (type === 'new') {
-                document.getElementById('btn-new').classList.add('active');
-                document.getElementById('btn-repeat').classList.remove('active');
-            } else {
-                document.getElementById('btn-new').classList.remove('active');
-                document.getElementById('btn-repeat').classList.add('active');
-            }
-        }
-    </script>
+    const data = dashboardData[type];
+
+    document.getElementById('d-revenue').innerText = '₹' + data.revenue;
+    document.getElementById('d-rev-percent').innerText = data.revPercent + '%';
+    document.getElementById('d-purchases').innerText = data.purchases;
+    document.getElementById('d-purch-percent').innerText = data.purchPercent + '%';
+    document.getElementById('d-units').innerText = data.units;
+    document.getElementById('d-clicks').innerText = data.clicks;
+    document.getElementById('d-views').innerText = data.views;
+    document.getElementById('d-users').innerText = data.users;
+
+    document.getElementById('btn-new').classList.toggle('active', type === 'new');
+    document.getElementById('btn-repeat').classList.toggle('active', type === 'repeat');
+
+    loadCampaignChart(type);
+    loadDodChart(type);
+}
+
+
+/* ===================================================== */
+/*               2) CAMPAIGN CHART                       */
+/* ===================================================== */
+const campaignData = {
+    new: {
+        labels: {{ chart_new_campaigns|safe }},
+        sales: {{ chart_new_sales|safe }},
+        spend: {{ chart_new_spend|safe }}
+    },
+    repeat: {
+        labels: {{ chart_repeat_campaigns|safe }},
+        sales: {{ chart_repeat_sales|safe }},
+        spend: {{ chart_repeat_spend|safe }}
+    }
+};
+
+const campaignChart = echarts.init(document.getElementById('campaignChart'));
+
+function loadCampaignChart(type) {
+    const data = campaignData[type];
+
+    const option = {
+        title: { text: "Campaign Performance (" + type.toUpperCase() + ")" },
+        tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+        legend: {},
+        xAxis: { type: "value" },
+        yAxis: { type: "category", data: data.labels },
+        series: [
+            { name: "Spend", type: "bar", data: data.spend },
+            { name: "Sales", type: "bar", data: data.sales }
+        ]
+    };
+    campaignChart.setOption(option);
+}
+
+
+/* ===================================================== */
+/*                   3) DODTABLE CHART                   */
+/* ===================================================== */
+const dodData = {
+    new: {
+        labels: {{ dod_new_labels|safe }},
+        sales: {{ dod_new_sales|safe }},
+        purchase: {{ dod_new_purchase|safe }}
+    },
+    repeat: {
+        labels: {{ dod_repeat_labels|safe }},
+        sales: {{ dod_repeat_sales|safe }},
+        purchase: {{ dod_repeat_purchase|safe }}
+    }
+};
+
+const dodChart = echarts.init(document.getElementById('dodChart'));
+
+function loadDodChart(type) {
+    const data = dodData[type];
+
+    const option = {
+        title: { text: "Ad Product Performance (" + type.toUpperCase() + ")" },
+        tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+        legend: {},
+        xAxis: { type: "value" },
+        yAxis: { type: "category", data: data.labels },
+        series: [
+            { name: "Sales", type: "bar", data: data.sales },
+            { name: "Purchase", type: "bar", data: data.purchase }
+        ]
+    };
+
+    dodChart.setOption(option);
+}
+
+
+/* ===================================================== */
+/*                   DEFAULT LOAD                        */
+/* ===================================================== */
+loadCampaignChart("new");
+loadDodChart("new");
+
+</script>
 {% endblock %}
